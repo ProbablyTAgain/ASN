@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import SustainabilityIllustration from "@/components/SustainabilityIllustration";
 
 export default function MissionSection() {
   return (
@@ -24,11 +25,8 @@ export default function MissionSection() {
             </Link>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950">
-            <div className="h-full aspect-[4/3]" />
-            <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-background text-lg font-semibold">
-              Sustainable operations and circular resource solutions in Arizona
-            </div>
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 aspect-[4/3]">
+            <SustainabilityIllustration />
           </div>
         </div>
       </div>

@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import HeroIllustration from "@/components/HeroIllustration";
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_25%),radial-gradient(circle_at_bottom_right,_rgba(132,204,22,0.16),_transparent_35%),bg-slate-950]">
-      
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-background">
+      <HeroIllustration />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/40" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full pt-24">
@@ -42,7 +43,7 @@ export default function HeroSection() {
               <h3 className="font-heading text-xl text-foreground mb-6">Quick Connect</h3>
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Waste Type</label>
+                  <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Waste Type</label>
                   <select className="w-full bg-white border border-border px-4 py-3 text-foreground text-sm focus:border-primary focus:outline-none transition-colors">
                     <option value="">Select waste type</option>
                     <option>Electronics</option>
@@ -54,11 +55,11 @@ export default function HeroSection() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Zip Code</label>
+                  <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Zip Code</label>
                   <input
                     type="text"
                     placeholder="Enter zip code"
-                    className="w-full bg-white border border-border px-4 py-3 text-foreground text-sm placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors" />
+                    className="w-full bg-white border border-border px-4 py-3 text-foreground text-sm placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors" />
                   
                 </div>
               </div>

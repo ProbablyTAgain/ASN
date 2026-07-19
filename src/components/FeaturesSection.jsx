@@ -48,7 +48,7 @@ export default function FeaturesSection() {
               strokeWidth={1.5} />
             
               <h3 className="font-heading text-xl text-foreground mb-3">{feature.title}</h3>
-              <p className="text-foreground/60 text-sm leading-relaxed">{feature.description}</p>
+              <p className="text-foreground/70 text-sm leading-relaxed">{feature.description}</p>
             </div>
           )}
         </div>

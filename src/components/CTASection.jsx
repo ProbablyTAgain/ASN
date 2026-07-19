@@ -9,7 +9,7 @@ export default function CTASection() {
       <div className="absolute inset-0 bg-foreground/85" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 text-center">
-        <p className="tracking-[0.3em] uppercase mb-6 text-[hsl(var(--accent))] text-sm">JOIN THE NETWORK</p>
+        <p className="tracking-[0.3em] uppercase mb-6 text-accent-light text-sm">JOIN THE NETWORK</p>
         <h2 className="font-heading text-3xl md:text-5xl lg:text-6xl text-background leading-tight mb-6 max-w-3xl mx-auto">
           Your business is a pillar of Arizona's future
         </h2>

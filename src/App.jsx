@@ -10,6 +10,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Home from '@/pages/Home';
 import About from '@/pages/About';
 import FAQ from '@/pages/FAQ';
+import SustainabilityQuiz from '@/pages/SustainabilityQuiz';
 import Dashboard from '@/pages/Dashboard';
 import Events from '@/pages/Events';
 import Profile from '@/pages/Profile';
@@ -36,6 +37,7 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/faq" element={<FAQ />} />
+      <Route path="/quiz" element={<SustainabilityQuiz />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />

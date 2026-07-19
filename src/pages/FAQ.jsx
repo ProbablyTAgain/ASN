@@ -54,7 +54,7 @@ export default function FAQ() {
           <h1 className="font-heading text-4xl md:text-6xl text-foreground leading-tight mb-4">
             Frequently Asked Questions
           </h1>
-          <p className="text-foreground/60 text-lg max-w-xl">
+          <p className="text-foreground/70 text-lg max-w-xl">
             Answers to common questions about waste disposal regulations and using the platform.
           </p>
         </div>

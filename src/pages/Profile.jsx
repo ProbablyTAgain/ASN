@@ -117,7 +117,7 @@ export default function Profile() {
           <h1 className="font-heading text-4xl md:text-5xl text-foreground leading-tight mb-4 text-center">
             Your Business Profile
           </h1>
-          <p className="text-foreground/60 text-center mb-12">
+          <p className="text-foreground/70 text-center mb-12">
             Your business is a pillar of the Arizona future.
           </p>
 
@@ -159,7 +159,7 @@ export default function Profile() {
           {/* Live Name Preview */}
           {form.business_name && (
             <div className="text-center mb-12 py-6 border-t border-b border-border">
-              <p className="text-xs tracking-[0.2em] uppercase text-foreground/40 mb-2">Preview</p>
+              <p className="text-xs tracking-[0.2em] uppercase text-foreground/70 mb-2">Preview</p>
               <h2 className="font-heading text-3xl md:text-4xl text-foreground">{form.business_name}</h2>
             </div>
           )}
@@ -167,75 +167,75 @@ export default function Profile() {
           {/* Form */}
           <div className="space-y-6">
             <div>
-              <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Business Name *</label>
+              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Business Name *</label>
               <input
                 type="text"
                 value={form.business_name}
                 onChange={(e) => setForm((prev) => ({ ...prev, business_name: e.target.value }))}
                 placeholder="Your business name"
-                className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors"
+                className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Description</label>
+              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Description</label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
                 placeholder="Tell us about your business and sustainability efforts..."
                 rows={4}
-                className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors resize-none"
+                className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors resize-none"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Phone</label>
+                <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Phone</label>
                 <input
                   type="tel"
                   value={form.phone}
                   onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
                   placeholder="(602) 555-1234"
-                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors"
+                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
                 />
               </div>
               <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Email</label>
+                <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Email</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                   placeholder="contact@business.com"
-                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors"
+                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Website</label>
+                <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Website</label>
                 <input
                   type="url"
                   value={form.website}
                   onChange={(e) => setForm((prev) => ({ ...prev, website: e.target.value }))}
                   placeholder="https://business.com"
-                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors"
+                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
                 />
               </div>
               <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-2">Zip Code</label>
+                <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Zip Code</label>
                 <input
                   type="text"
                   value={form.zip_code}
                   onChange={(e) => setForm((prev) => ({ ...prev, zip_code: e.target.value }))}
                   placeholder="85001"
-                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors"
+                  className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs tracking-[0.15em] uppercase text-foreground/50 block mb-3">Waste Types Handled</label>
+              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-3">Waste Types Handled</label>
               <div className="flex flex-wrap gap-2">
                 {WASTE_TYPES.map((type) => (
                   <button
@@ -244,7 +244,7 @@ export default function Profile() {
                     className={`px-4 py-2 text-sm tracking-[0.05em] uppercase transition-colors ${
                       form.waste_types.includes(type)
                         ? "bg-accent text-background"
-                        : "border border-border text-foreground/60 hover:border-accent hover:text-accent"
+                        : "border border-border text-foreground/70 hover:border-accent hover:text-accent"
                     }`}
                   >
                     {type}

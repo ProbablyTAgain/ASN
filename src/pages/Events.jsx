@@ -57,7 +57,7 @@ export default function Events() {
           <h1 className="font-heading text-4xl md:text-6xl text-foreground leading-tight mb-4">
             Sustainability Events
           </h1>
-          <p className="text-foreground/60 text-lg max-w-xl">
+          <p className="text-foreground/70 text-lg max-w-xl">
             Workshops, networking, and community events driving Arizona's green economy forward.
           </p>
         </div>
@@ -76,15 +76,15 @@ export default function Events() {
         </div>
       ) : events.length === 0 ? (
         <div className="text-center py-24 max-w-7xl mx-auto px-6 md:px-12">
-          <p className="text-foreground/40 text-lg mb-2">No upcoming events</p>
-          <p className="text-foreground/30 text-sm">
+          <p className="text-foreground/70 text-lg mb-2">No upcoming events</p>
+          <p className="text-foreground/70 text-sm">
             Check back soon for sustainability events across Arizona.
           </p>
         </div>
       ) : filteredEvents.length === 0 ? (
         <div className="text-center py-24 max-w-7xl mx-auto px-6 md:px-12">
-          <p className="text-foreground/40 text-lg mb-2">No events on this date</p>
-          <p className="text-foreground/30 text-sm">
+          <p className="text-foreground/70 text-lg mb-2">No events on this date</p>
+          <p className="text-foreground/70 text-sm">
             Try selecting a different date on the calendar.
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function Events() {
                   <span className="font-heading text-3xl text-primary block">
                     {moment(event.date).format("DD")}
                   </span>
-                  <span className="text-xs tracking-[0.15em] uppercase text-foreground/40">
+                  <span className="text-xs tracking-[0.15em] uppercase text-foreground/70">
                     {moment(event.date).format("MMM YYYY")}
                   </span>
                 </div>
@@ -137,7 +137,7 @@ export default function Events() {
                   )}
                   <h3 className="font-heading text-lg text-foreground mb-2 line-clamp-2">{event.title}</h3>
                   {event.location && (
-                    <p className="text-foreground/40 text-sm mt-auto">{event.location}</p>
+                    <p className="text-foreground/70 text-sm mt-auto">{event.location}</p>
                   )}
                 </div>
 

@@ -48,7 +48,7 @@ export default function Dashboard() {
           <h1 className="font-heading text-4xl md:text-6xl text-foreground leading-tight mb-4">
             The Resource Vault
           </h1>
-          <p className="text-foreground/60 text-lg max-w-xl">
+          <p className="text-foreground/70 text-lg max-w-xl">
             Browse verified waste management partners across Arizona. Connect directly via phone or email.
           </p>
         </div>
@@ -59,17 +59,17 @@ export default function Dashboard() {
 
         <div className="flex flex-col sm:flex-row gap-4 mb-10">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/70" />
             <input
               type="text"
               placeholder="Search businesses..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-card border border-border pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors"
+              className="w-full bg-card border border-border pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
             />
           </div>
           <div className="relative">
-            <SlidersHorizontal size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30" />
+            <SlidersHorizontal size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/70" />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -89,8 +89,8 @@ export default function Dashboard() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-24">
-            <p className="text-foreground/40 text-lg mb-4">No resources found</p>
-            <p className="text-foreground/30 text-sm mb-8">
+            <p className="text-foreground/70 text-lg mb-4">No resources found</p>
+            <p className="text-foreground/70 text-sm mb-8">
               {businesses.length === 0
                 ? "Be the first to add your business to the directory."
                 : "Try adjusting your search or filters."}

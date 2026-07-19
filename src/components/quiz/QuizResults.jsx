@@ -23,7 +23,7 @@ export default function QuizResults({ answers, onRestart }) {
       <h1 className="font-heading text-3xl md:text-5xl text-foreground leading-tight mb-4">
         Recommended resources for you
       </h1>
-      <p className="text-foreground/60 text-lg mb-10">
+      <p className="text-foreground/70 text-lg mb-10">
         Based on your profile as a {answers.orgType} ({answers.employeeCount}), here are resources to get you started.
       </p>
 
@@ -31,7 +31,7 @@ export default function QuizResults({ answers, onRestart }) {
         {topRecommendations.map((item, i) => (
           <div key={i} className="border border-border p-6 bg-card">
             <h3 className="font-heading text-lg text-foreground mb-2">{item.title}</h3>
-            <p className="text-foreground/60 text-sm leading-relaxed">{item.description}</p>
+            <p className="text-foreground/70 text-sm leading-relaxed">{item.description}</p>
           </div>
         ))}
       </div>

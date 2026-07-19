@@ -46,7 +46,7 @@ export default function EventsPreview() {
                       <h4 className="text-foreground font-medium text-lg group-hover:text-primary transition-colors">
                         {event.title}
                       </h4>
-                      <p className="text-foreground/50 text-sm mt-1">{event.location}</p>
+                      <p className="text-foreground/70 text-sm mt-1">{event.location}</p>
                     </div>
                   </div>
                 </div>

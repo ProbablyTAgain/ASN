@@ -28,7 +28,7 @@ export default function ResourceCard({ business, onClick }) {
             {business.business_name}
           </h3>
           {business.description && (
-            <p className="text-foreground/50 text-sm mt-1 line-clamp-2">{business.description}</p>
+            <p className="text-foreground/70 text-sm mt-1 line-clamp-2">{business.description}</p>
           )}
         </div>
       </div>
@@ -47,7 +47,7 @@ export default function ResourceCard({ business, onClick }) {
       )}
 
       {business.zip_code && (
-        <div className="flex items-center gap-2 text-foreground/40 text-sm mb-5">
+        <div className="flex items-center gap-2 text-foreground/70 text-sm mb-5">
           <MapPin size={14} />
           <span>{business.zip_code}</span>
         </div>

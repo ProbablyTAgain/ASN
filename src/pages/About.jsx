@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SustainabilityIllustration from "@/components/SustainabilityIllustration";
 
 export default function About() {
   return (
@@ -16,7 +17,7 @@ export default function About() {
           <h1 className="font-heading text-4xl md:text-6xl text-foreground leading-tight mb-6 max-w-3xl">
             Building a greener Arizona, one connection at a time
           </h1>
-          <p className="text-foreground/60 text-lg max-w-2xl leading-relaxed">
+          <p className="text-foreground/70 text-lg max-w-2xl leading-relaxed">
             The Arizona Sustainability Navigator exists to close the gap between local businesses and the waste management resources they need to operate responsibly.
           </p>
         </div>
@@ -35,14 +36,8 @@ export default function About() {
               We built the Navigator to remove that friction. By putting verified waste management resources one phone call or email away, we help businesses act on sustainability instead of just intending to.
             </p>
           </div>
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950">
-            <div className="h-full aspect-[4/3]" />
-            <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-background">
-              <div>
-                <p className="font-semibold text-lg">Arizona recycling and sustainability hub</p>
-                <p className="mt-3 text-foreground/70">A local asset illustration for our mission-driven platform.</p>
-              </div>
-            </div>
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 aspect-[4/3]">
+            <SustainabilityIllustration />
           </div>
         </div>
 
@@ -63,7 +58,7 @@ export default function About() {
           ].map((item) => (
             <div key={item.title} className="p-8 md:p-10 border border-border">
               <h3 className="font-heading text-xl text-foreground mb-3">{item.title}</h3>
-              <p className="text-foreground/60 text-sm leading-relaxed">{item.text}</p>
+              <p className="text-foreground/70 text-sm leading-relaxed">{item.text}</p>
             </div>
           ))}
         </div>

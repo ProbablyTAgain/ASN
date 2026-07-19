@@ -18,7 +18,7 @@ export default function FAQItem({ question, answer }) {
         )}
       </button>
       {open && (
-        <p className="text-foreground/60 text-sm leading-relaxed pb-6 max-w-2xl">{answer}</p>
+        <p className="text-foreground/70 text-sm leading-relaxed pb-6 max-w-2xl">{answer}</p>
       )}
     </div>
   );

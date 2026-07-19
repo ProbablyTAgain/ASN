@@ -130,7 +130,7 @@ export default function SustainabilityQuiz() {
                   className={`px-4 py-2.5 text-sm tracking-[0.02em] transition-colors ${
                   answers.orgType === option ?
                   "bg-primary text-primary-foreground" :
-                  "border border-border text-foreground/60 hover:border-primary hover:text-primary"}`
+                  "border border-border text-foreground/70 hover:border-primary hover:text-primary"}`
                   }>
                   
                       {option}
@@ -144,7 +144,7 @@ export default function SustainabilityQuiz() {
                 value={answers.orgTypeOther}
                 onChange={(e) => update("orgTypeOther", e.target.value)}
                 placeholder="Tell us more"
-                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors mt-4" />
+                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors mt-4" />
 
               }
               </div>
@@ -166,7 +166,7 @@ export default function SustainabilityQuiz() {
                 className={`px-4 py-2.5 text-sm tracking-[0.02em] transition-colors ${
                 answers.employeeCount === option ?
                 "bg-primary text-primary-foreground" :
-                "border border-border text-foreground/60 hover:border-primary hover:text-primary"}`
+                "border border-border text-foreground/70 hover:border-primary hover:text-primary"}`
                 }>
                 
                     {option}
@@ -192,7 +192,7 @@ export default function SustainabilityQuiz() {
                   className={`px-5 py-3 text-sm tracking-[0.02em] transition-colors ${
                   answers.sustainabilitySteps.includes(option.value) ?
                   "bg-primary text-primary-foreground" :
-                  "border border-border text-foreground/60 hover:border-primary hover:text-primary"}`
+                  "border border-border text-foreground/70 hover:border-primary hover:text-primary"}`
                   }>
                   
                       {option.label}
@@ -206,11 +206,11 @@ export default function SustainabilityQuiz() {
                 value={answers.sustainabilityOther}
                 onChange={(e) => update("sustainabilityOther", e.target.value)}
                 placeholder="Tell us more"
-                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors mt-4" />
+                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors mt-4" />
 
               }
               </div>
-              <p className="text-foreground/50 text-sm mb-10">Select all that apply.</p>
+              <p className="text-foreground/70 text-sm mb-10">Select all that apply.</p>
             </div>
           }
 
@@ -230,7 +230,7 @@ export default function SustainabilityQuiz() {
                   className={`px-5 py-3 text-sm tracking-[0.02em] transition-colors ${
                   answers.toolsUsed.includes(option.value) ?
                   "bg-primary text-primary-foreground" :
-                  "border border-border text-foreground/60 hover:border-primary hover:text-primary"}`
+                  "border border-border text-foreground/70 hover:border-primary hover:text-primary"}`
                   }>
                   
                       {option.label}
@@ -244,11 +244,11 @@ export default function SustainabilityQuiz() {
                 value={answers.toolsUsedOther}
                 onChange={(e) => update("toolsUsedOther", e.target.value)}
                 placeholder="Tell us more"
-                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors mt-4" />
+                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors mt-4" />
 
               }
               </div>
-              <p className="text-foreground/50 text-sm mb-10">Select all that apply.</p>
+              <p className="text-foreground/70 text-sm mb-10">Select all that apply.</p>
             </div>
           }
 
@@ -268,7 +268,7 @@ export default function SustainabilityQuiz() {
                   className={`px-5 py-3 text-sm tracking-[0.02em] transition-colors ${
                   answers.challenges.includes(option.value) ?
                   "bg-primary text-primary-foreground" :
-                  "border border-border text-foreground/60 hover:border-primary hover:text-primary"}`
+                  "border border-border text-foreground/70 hover:border-primary hover:text-primary"}`
                   }>
                   
                       {option.label}
@@ -282,11 +282,11 @@ export default function SustainabilityQuiz() {
                 value={answers.challengesOther}
                 onChange={(e) => update("challengesOther", e.target.value)}
                 placeholder="Tell us more"
-                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors mt-4" />
+                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors mt-4" />
 
               }
               </div>
-              <p className="text-foreground/50 text-sm mb-10">Select all that apply.</p>
+              <p className="text-foreground/70 text-sm mb-10">Select all that apply.</p>
             </div>
           }
 
@@ -306,7 +306,7 @@ export default function SustainabilityQuiz() {
                   className={`px-5 py-3 text-sm tracking-[0.02em] transition-colors ${
                   answers.supportNeeded.includes(option.value) ?
                   "bg-primary text-primary-foreground" :
-                  "border border-border text-foreground/60 hover:border-primary hover:text-primary"}`
+                  "border border-border text-foreground/70 hover:border-primary hover:text-primary"}`
                   }>
                   
                       {option.label}
@@ -320,11 +320,11 @@ export default function SustainabilityQuiz() {
                 value={answers.supportNeededOther}
                 onChange={(e) => update("supportNeededOther", e.target.value)}
                 placeholder="Tell us more"
-                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/30 focus:border-primary focus:outline-none transition-colors mt-4" />
+                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors mt-4" />
 
               }
               </div>
-              <p className="text-foreground/50 text-sm mb-10">Select all that apply.</p>
+              <p className="text-foreground/70 text-sm mb-10">Select all that apply.</p>
             </div>
           }
 

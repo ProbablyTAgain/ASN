@@ -12,7 +12,7 @@ export default function ResourceDetailPanel({ business, onClose }) {
       <div className="relative w-full max-w-lg bg-background h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right">
         <div className="sticky top-0 bg-background z-10 p-6 border-b border-border flex items-center justify-between">
           <span className="text-xs tracking-[0.2em] uppercase text-primary">Resource Details</span>
-          <button onClick={onClose} className="text-foreground/40 hover:text-foreground transition-colors">
+          <button onClick={onClose} className="text-foreground/70 hover:text-foreground transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -53,7 +53,7 @@ export default function ResourceDetailPanel({ business, onClose }) {
           )}
 
           {business.zip_code && (
-            <div className="flex items-center gap-3 text-foreground/60 mb-8">
+            <div className="flex items-center gap-3 text-foreground/70 mb-8">
               <MapPin size={16} className="text-primary" />
               <span className="text-sm">{business.zip_code}</span>
             </div>
