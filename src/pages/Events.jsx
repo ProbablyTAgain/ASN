@@ -1,18 +1,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import { api } from "@/api/client";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventDetailPanel from "@/components/EventDetailPanel";
 import EventsCalendar from "@/components/EventsCalendar";
+import AddEventModal from "@/components/AddEventModal";
 
 export default function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(undefined);
+  const [showAddEvent, setShowAddEvent] = useState(false);
   const scrollRef = useRef(null);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     loadEvents();
@@ -27,6 +33,19 @@ export default function Events() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePostEventClick = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    setShowAddEvent(true);
+  };
+
+  const handleEventCreated = () => {
+    setShowAddEvent(false);
+    loadEvents();
   };
 
   const filteredEvents = selectedDate
@@ -52,14 +71,22 @@ export default function Events() {
       <Navbar />
 
       <div className="pt-24 pb-12 md:pt-32 md:pb-16">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <p className="text-xs tracking-[0.3em] uppercase text-primary mb-4">The Horizon Calendar</p>
-          <h1 className="font-heading text-4xl md:text-6xl text-foreground leading-tight mb-4">
-            Sustainability Events
-          </h1>
-          <p className="text-foreground/70 text-lg max-w-xl">
-            Workshops, networking, and community events driving Arizona's green economy forward.
-          </p>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <div>
+            <p className="text-xs tracking-[0.3em] uppercase text-primary mb-4">The Horizon Calendar</p>
+            <h1 className="font-heading text-4xl md:text-6xl text-foreground leading-tight mb-4">
+              Sustainability Events
+            </h1>
+            <p className="text-foreground/70 text-lg max-w-xl">
+              Workshops, networking, and community events driving Arizona's green economy forward.
+            </p>
+          </div>
+          <button
+            onClick={handlePostEventClick}
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 text-sm tracking-[0.1em] uppercase hover:bg-primary/90 transition-colors self-start"
+          >
+            <Plus size={16} /> Post Event
+          </button>
         </div>
       </div>
 
@@ -157,6 +184,10 @@ export default function Events() {
 
       {selectedEvent && (
         <EventDetailPanel event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
+
+      {showAddEvent && (
+        <AddEventModal onClose={() => setShowAddEvent(false)} onCreated={handleEventCreated} />
       )}
     </div>
   );

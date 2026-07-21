@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { X } from "lucide-react";
 import LogoUrl from "./logo.png";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <>
@@ -25,15 +27,32 @@ export default function Navbar() {
             <Link to="/events" className="text-foreground text-xs tracking-[0.2em] uppercase hover:text-primary transition-colors">
               Events
             </Link>
-            <Link to="/login" className="text-xs tracking-[0.2em] uppercase text-primary-foreground px-5 py-2.5 hover:bg-primary/90 transition-colors bg-[hsl(var(--muted-foreground))]">SIGN IN
-
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link to="/profile" className="text-foreground text-xs tracking-[0.2em] uppercase hover:text-primary transition-colors">
+                  Profile
+                </Link>
+                <button
+                  onClick={logout}
+                  className="text-xs tracking-[0.2em] uppercase text-primary-foreground px-5 py-2.5 hover:bg-primary/90 transition-colors bg-[hsl(var(--muted-foreground))]"
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="text-xs tracking-[0.2em] uppercase text-primary-foreground px-5 py-2.5 hover:bg-primary/90 transition-colors bg-[hsl(var(--muted-foreground))]"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           <button
             onClick={() => setMenuOpen(true)}
             className="md:hidden text-foreground text-xs tracking-[0.2em] uppercase">
-            
+
             MENU
           </button>
         </div>
@@ -47,7 +66,7 @@ export default function Navbar() {
             <button
             onClick={() => setMenuOpen(false)}
             className="self-end text-background mb-12">
-            
+
               <X size={24} />
             </button>
             <div className="flex flex-col gap-8">
@@ -62,19 +81,31 @@ export default function Navbar() {
               to={item.to}
               onClick={() => setMenuOpen(false)}
               className="text-background font-heading text-3xl hover:text-primary transition-colors">
-              
+
                   {item.label}
                 </Link>
             )}
             </div>
             <div className="mt-auto">
-              <Link
-              to="/login"
-              onClick={() => setMenuOpen(false)}
-              className="inline-block text-primary text-xs tracking-[0.2em] uppercase border border-primary px-6 py-3 hover:bg-primary hover:text-primary-foreground transition-colors">
-              
-                Sign In
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    logout();
+                  }}
+                  className="inline-block text-primary text-xs tracking-[0.2em] uppercase border border-primary px-6 py-3 hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  Log Out
+                </button>
+              ) : (
+                <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="inline-block text-primary text-xs tracking-[0.2em] uppercase border border-primary px-6 py-3 hover:bg-primary hover:text-primary-foreground transition-colors">
+
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -1,13 +1,15 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [isLoadingAuth, setIsLoadingAuth] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
   const [authError, setAuthError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
 
@@ -15,14 +17,53 @@ export function AuthProvider({ children }) {
     navigate("/login", { replace: true });
   }, [navigate]);
 
-  const checkUserAuth = useCallback(() => {
-    setIsLoadingAuth(false);
-    setIsAuthenticated(true);
-    setAuthError(null);
+  const checkUserAuth = useCallback(async () => {
+    setIsLoadingAuth(true);
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      if (data?.session?.user) {
+        setUser(data.session.user);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+      setAuthError(null);
+    } catch {
+      setUser(null);
+      setIsAuthenticated(false);
+      setAuthError(null);
+    } finally {
+      setIsLoadingAuth(false);
+    }
   }, []);
+
+  const signInWithGoogle = useCallback(async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) throw error;
+  }, []);
+
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setIsAuthenticated(false);
+    navigate("/", { replace: true });
+  }, [navigate]);
 
   useEffect(() => {
     checkUserAuth();
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setIsAuthenticated(!!session?.user);
+      setIsLoadingAuth(false);
+    });
+
+    return () => data?.subscription?.unsubscribe();
   }, [checkUserAuth]);
 
   const value = {
@@ -31,8 +72,11 @@ export function AuthProvider({ children }) {
     authError,
     isAuthenticated,
     authChecked: !isLoadingAuth,
+    user,
     navigateToLogin,
     checkUserAuth,
+    logout,
+    signInWithGoogle,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

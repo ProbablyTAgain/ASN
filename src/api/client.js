@@ -1,9 +1,7 @@
+import { supabase } from "@/lib/supabase";
+
 const STORAGE_KEYS = {
-  users: "asn_site_users",
-  currentUser: "asn_site_current_user",
-  profiles: "asn_site_profiles",
   events: "asn_site_events",
-  verifications: "asn_site_verifications",
 };
 
 const readStorage = (key, defaultValue) => {
@@ -27,20 +25,8 @@ const generateId = () => {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 };
 
-const generateToken = (userId) => {
-  return btoa(`${userId}:${Date.now()}`);
-};
-
-const getUsers = () => readStorage(STORAGE_KEYS.users, []);
-const saveUsers = (users) => writeStorage(STORAGE_KEYS.users, users);
-const getCurrentUser = () => readStorage(STORAGE_KEYS.currentUser, null);
-const saveCurrentUser = (user) => writeStorage(STORAGE_KEYS.currentUser, user);
-const getProfiles = () => readStorage(STORAGE_KEYS.profiles, []);
-const saveProfiles = (profiles) => writeStorage(STORAGE_KEYS.profiles, profiles);
 const getEvents = () => readStorage(STORAGE_KEYS.events, []);
 const saveEvents = (events) => writeStorage(STORAGE_KEYS.events, events);
-const getVerifications = () => readStorage(STORAGE_KEYS.verifications, {});
-const saveVerifications = (data) => writeStorage(STORAGE_KEYS.verifications, data);
 
 const ensureSampleEvents = () => {
   const existing = getEvents();
@@ -76,157 +62,87 @@ const ensureSampleEvents = () => {
   return sampleEvents;
 };
 
-const findUserByEmail = (email) => getUsers().find((user) => user.email.toLowerCase() === email.toLowerCase());
-const getUserById = (id) => getUsers().find((user) => user.id === id);
-
 const api = {
-  auth: {
-    register: async ({ email, password }) => {
-      const existingUser = findUserByEmail(email);
-      if (existingUser) {
-        throw new Error("A user with that email already exists.");
-      }
-
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const verifications = getVerifications();
-      verifications[email.toLowerCase()] = { email, password, code, createdAt: Date.now() };
-      saveVerifications(verifications);
-
-      return { pending: true, code };
-    },
-
-    verifyOtp: async ({ email, otpCode }) => {
-      const verifications = getVerifications();
-      const verification = verifications[email.toLowerCase()];
-      if (!verification || verification.code !== otpCode) {
-        throw new Error("Invalid verification code.");
-      }
-
-      const newUser = {
-        id: generateId(),
-        email: verification.email,
-        password: verification.password,
-        createdAt: Date.now(),
-      };
-      const users = getUsers();
-      saveUsers([...users, newUser]);
-      delete verifications[email.toLowerCase()];
-      saveVerifications(verifications);
-
-      const token = generateToken(newUser.id);
-      saveCurrentUser({ id: newUser.id, token });
-      return { access_token: token };
-    },
-
-    setToken: (token) => {
-      const current = getCurrentUser() || {};
-      saveCurrentUser({ ...current, token });
-    },
-
-    resendOtp: async (email) => {
-      const verifications = getVerifications();
-      const verification = verifications[email.toLowerCase()];
-      if (!verification) {
-        throw new Error("No pending verification found for that email.");
-      }
-      verification.code = Math.floor(100000 + Math.random() * 900000).toString();
-      verification.createdAt = Date.now();
-      saveVerifications(verifications);
-      return { code: verification.code };
-    },
-
-    loginViaEmailPassword: async (email, password) => {
-      const user = findUserByEmail(email);
-      if (!user || user.password !== password) {
-        throw new Error("Invalid email or password.");
-      }
-      const token = generateToken(user.id);
-      saveCurrentUser({ id: user.id, token });
-      return { access_token: token };
-    },
-
-    loginWithProvider: (provider, redirect = "/") => {
-      const providerEmail = `${provider}@local.provider`;
-      let user = findUserByEmail(providerEmail);
-      if (!user) {
-        user = {
-          id: generateId(),
-          email: providerEmail,
-          password: "",
-          createdAt: Date.now(),
-          provider,
-        };
-        saveUsers([...getUsers(), user]);
-      }
-      const token = generateToken(user.id);
-      saveCurrentUser({ id: user.id, token });
-      window.location.href = redirect;
-    },
-
-    resetPasswordRequest: async (email) => {
-      const user = findUserByEmail(email);
-      if (!user) {
-        return { status: "ok" };
-      }
-      return { status: "ok" };
-    },
-
-    me: async () => {
-      const current = getCurrentUser();
-      if (!current?.id) {
-        throw new Error("Not authenticated.");
-      }
-      const user = getUserById(current.id);
-      if (!user) {
-        throw new Error("User not found.");
-      }
-      return user;
-    },
-  },
-
   entities: {
     BusinessProfile: {
       list: async () => {
-        return getProfiles();
+        const { data, error } = await supabase
+          .from("business_profiles")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        return data;
       },
       filter: async (query) => {
-        const profiles = getProfiles();
-        return profiles.filter((profile) => {
-          return Object.entries(query).every(([key, value]) => {
-            if (Array.isArray(value)) {
-              return value.every((item) => profile[key]?.includes(item));
-            }
-            return profile[key] === value;
-          });
-        });
+        let request = supabase.from("business_profiles").select("*");
+        for (const [key, value] of Object.entries(query)) {
+          request = request.eq(key, value);
+        }
+        const { data, error } = await request;
+        if (error) throw error;
+        return data;
       },
       update: async (id, data) => {
-        const profiles = getProfiles();
-        const updated = profiles.map((profile) => (profile.id === id ? { ...profile, ...data } : profile));
-        saveProfiles(updated);
-        return updated.find((profile) => profile.id === id) || null;
+        const { data: updated, error } = await supabase
+          .from("business_profiles")
+          .update({ ...data, updated_at: new Date().toISOString() })
+          .eq("id", id)
+          .select()
+          .single();
+        if (error) throw error;
+        return updated;
       },
       create: async (data) => {
-        const newProfile = { id: generateId(), ...data, createdAt: Date.now() };
-        const profiles = getProfiles();
-        saveProfiles([...profiles, newProfile]);
-        return newProfile;
+        const { data: created, error } = await supabase
+          .from("business_profiles")
+          .upsert({ ...data, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return created;
       },
     },
     Event: {
       list: async () => {
-        return ensureSampleEvents();
+        const events = ensureSampleEvents();
+        return [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+      },
+      create: async (data) => {
+        const events = ensureSampleEvents();
+        const newEvent = { id: generateId(), ...data, createdAt: Date.now() };
+        saveEvents([...events, newEvent]);
+        return newEvent;
       },
     },
   },
 
   integrations: {
     Core: {
-      UploadFile: async ({ file }) => {
+      UploadFile: async ({ file, userId }) => {
         if (!file) {
           throw new Error("No file provided.");
         }
-        return { file_url: URL.createObjectURL(file) };
+        if (!userId) {
+          throw new Error("You must be signed in to upload a file.");
+        }
+        if (!file.type || !file.type.startsWith("image/")) {
+          throw new Error("Please upload an image file.");
+        }
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error("Image must be smaller than 5MB.");
+        }
+
+        const extension = file.name.split(".").pop() || "jpg";
+        const path = `${userId}/logo-${Date.now()}.${extension}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("business-logos")
+          .upload(path, file, { upsert: true });
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage.from("business-logos").getPublicUrl(path);
+        return { file_url: data.publicUrl };
       },
     },
   },

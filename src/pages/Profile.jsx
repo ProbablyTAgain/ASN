@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { api } from "@/api/client";
 import { Upload, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -9,6 +10,7 @@ const WASTE_TYPES = ["Electronics", "Organic", "Construction", "Hazardous", "Rec
 
 export default function Profile() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,13 +28,12 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    if (user) loadProfile();
+  }, [user]);
 
   const loadProfile = async () => {
     try {
-      const user = await api.auth.me();
-      const profiles = await api.entities.BusinessProfile.filter({ created_by_id: user.id });
+      const profiles = await api.entities.BusinessProfile.filter({ user_id: user.id });
       if (profiles.length > 0) {
         const p = profiles[0];
         setExistingId(p.id);
@@ -46,9 +47,12 @@ export default function Profile() {
           logo_url: p.logo_url || "",
           waste_types: p.waste_types || []
         });
+      } else if (user.email) {
+        setForm((prev) => ({ ...prev, email: user.email }));
       }
     } catch (e) {
       console.error(e);
+      toast({ title: "Failed to load profile", description: "Please refresh and try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -59,10 +63,11 @@ export default function Profile() {
     if (!file) return;
     setUploading(true);
     try {
-      const { file_url } = await api.integrations.Core.UploadFile({ file });
+      const { file_url } = await api.integrations.Core.UploadFile({ file, userId: user.id });
       setForm((prev) => ({ ...prev, logo_url: file_url }));
     } catch (e) {
-      toast({ title: "Upload failed", description: "Please try again.", variant: "destructive" });
+      console.error(e);
+      toast({ title: "Upload failed", description: e.message || "Please try again.", variant: "destructive" });
     } finally {
       setUploading(false);
     }
@@ -87,12 +92,13 @@ export default function Profile() {
       if (existingId) {
         await api.entities.BusinessProfile.update(existingId, form);
       } else {
-        const created = await api.entities.BusinessProfile.create(form);
+        const created = await api.entities.BusinessProfile.create({ ...form, user_id: user.id });
         setExistingId(created.id);
       }
       toast({ title: "Profile saved successfully" });
     } catch (e) {
-      toast({ title: "Failed to save", description: "Please try again.", variant: "destructive" });
+      console.error(e);
+      toast({ title: "Failed to save", description: e.message || "Please try again.", variant: "destructive" });
     } finally {
       setSaving(false);
     }

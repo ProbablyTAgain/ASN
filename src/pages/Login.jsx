@@ -1,35 +1,45 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "@/api/client";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
+import { LogIn, Mail, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
+import PasswordInput from "@/components/PasswordInput";
+import { useAuth } from "@/lib/AuthContext";
+import { getErrorMessage } from "@/lib/utils";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { signInWithGoogle } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await api.auth.loginViaEmailPassword(email, password);
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) throw signInError;
       window.location.href = "/";
     } catch (err) {
-      setError(err.message || "Invalid email or password");
+      setError(getErrorMessage(err, "Invalid email or password"));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogle = () => {
-    api.auth.loginWithProvider("google", "/");
+  const handleGoogle = async () => {
+    setError("");
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      setError(getErrorMessage(err, "Google sign-in failed. Please try again."));
+    }
   };
 
   return (
@@ -95,19 +105,13 @@ export default function Login() {
               Forgot password?
             </Link>
           </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
+          <PasswordInput
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
         </div>
         <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
           {loading ? (
