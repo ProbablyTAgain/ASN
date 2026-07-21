@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
+  // GitHub Pages serves this project at /ASN/, while local development uses /.
+  base: process.env.GITHUB_ACTIONS ? "/ASN/" : "/",
   plugins: [react(), tailwindcss()],
 
   server: {
