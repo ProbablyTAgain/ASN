@@ -24,7 +24,8 @@ export default function Profile() {
     website: "",
     zip_code: "",
     logo_url: "",
-    waste_types: []
+    waste_types: [],
+    is_listed: false
   });
 
   useEffect(() => {
@@ -45,7 +46,8 @@ export default function Profile() {
           website: p.website || "",
           zip_code: p.zip_code || "",
           logo_url: p.logo_url || "",
-          waste_types: p.waste_types || []
+          waste_types: p.waste_types || [],
+          is_listed: p.is_listed || false
         });
       } else if (user.email) {
         setForm((prev) => ({ ...prev, email: user.email }));
@@ -257,6 +259,31 @@ export default function Profile() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 border border-border p-4">
+              <div>
+                <p className="text-sm text-foreground font-medium">List on Resource Directory</p>
+                <p className="text-xs text-foreground/70 mt-1">
+                  Make this business visible to others browsing the Resource Vault. Off by default.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, is_listed: !prev.is_listed }))}
+                role="switch"
+                aria-checked={form.is_listed}
+                aria-label="List on Resource Directory"
+                className={`relative w-12 h-6 flex-shrink-0 rounded-full transition-colors ${
+                  form.is_listed ? "bg-primary" : "bg-border"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+                    form.is_listed ? "translate-x-6" : "translate-x-0"
+                  }`}
+                />
+              </button>
             </div>
 
             <div className="h-[0.5px] bg-border" />

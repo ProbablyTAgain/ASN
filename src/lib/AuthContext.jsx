@@ -40,9 +40,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
+    // window.location.origin never includes a path, so on GitHub Pages
+    // (served under /ASN/) it would redirect back outside the app entirely.
+    const redirectTo = window.location.origin + import.meta.env.BASE_URL;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo },
     });
     if (error) throw error;
   }, []);

@@ -69,6 +69,7 @@ const api = {
         const { data, error } = await supabase
           .from("business_profiles")
           .select("*")
+          .eq("is_listed", true)
           .order("created_at", { ascending: false });
         if (error) throw error;
         return data;
