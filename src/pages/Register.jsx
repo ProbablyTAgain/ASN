@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ export default function Register() {
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const { signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +38,7 @@ export default function Register() {
       if (signUpError) throw signUpError;
 
       if (data?.session) {
-        window.location.href = "/";
+        navigate("/");
       } else {
         setShowOtp(true);
       }
@@ -58,7 +59,7 @@ export default function Register() {
         type: "signup",
       });
       if (verifyError) throw verifyError;
-      window.location.href = "/";
+      navigate("/");
     } catch (err) {
       setError(getErrorMessage(err, "Invalid verification code"));
     } finally {
