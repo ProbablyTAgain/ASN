@@ -1,8 +1,18 @@
 // Import Supabase
 import { createClient } from "@supabase/supabase-js";
 
-// Get connection settings
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://example.supabase.co";
+// Get connection settings, normalizing away accidental duplicated/missing
+// "https://" prefixes (an easy mistake when pasting a URL into a field
+// that already has one, or leaving the protocol off entirely).
+const configuredSupabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const dedupedSupabaseUrl = configuredSupabaseUrl?.replace(/^(?:https?:)+\/\//, "https://");
+const normalizedSupabaseUrl = dedupedSupabaseUrl?.match(/^https?:\/\//)
+  ? dedupedSupabaseUrl
+  : dedupedSupabaseUrl
+  ? `https://${dedupedSupabaseUrl}`
+  : undefined;
+
+const supabaseUrl = normalizedSupabaseUrl || "https://example.supabase.co";
 const supabaseKey =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "demo-key";
 
