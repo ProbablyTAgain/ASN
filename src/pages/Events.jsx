@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "@/api/client";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Plus, X, Building2 } from "lucide-react";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
@@ -8,7 +8,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventDetailPanel from "@/components/EventDetailPanel";
 import EventsCalendar from "@/components/EventsCalendar";
-import AddEventModal from "@/components/AddEventModal";
+import AddEventModal, { CATEGORIES } from "@/components/AddEventModal";
+import { cn } from "@/lib/utils";
+import { WASTE_TYPES } from "@/lib/constants";
 
 export default function Events() {
   const [events, setEvents] = useState([]);
@@ -16,9 +18,12 @@ export default function Events() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(undefined);
   const [showAddEvent, setShowAddEvent] = useState(false);
-  const scrollRef = useRef(null);
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [wasteTypeFilter, setWasteTypeFilter] = useState("all");
+  const [onlyMine, setOnlyMine] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     loadEvents();
@@ -26,7 +31,7 @@ export default function Events() {
 
   const loadEvents = async () => {
     try {
-      const data = await api.entities.Event.list("date", 50);
+      const data = await api.entities.Event.list();
       setEvents(data);
     } catch (e) {
       console.error(e);
@@ -45,17 +50,35 @@ export default function Events() {
 
   const handleEventCreated = () => {
     setShowAddEvent(false);
+    setEditingEvent(null);
     loadEvents();
   };
 
-  const filteredEvents = selectedDate
-    ? events.filter((e) => moment(e.date).isSame(selectedDate, "day"))
-    : events;
-
-  const scroll = (dir) => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({ left: dir * 320, behavior: "smooth" });
+  const handleEventDeleted = (id) => {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
   };
+
+  const handleEditClick = (event) => {
+    setSelectedEvent(null);
+    setEditingEvent(event);
+  };
+
+  const hasActiveFilters = categoryFilter !== "all" || wasteTypeFilter !== "all" || onlyMine || !!selectedDate;
+
+  const clearFilters = () => {
+    setCategoryFilter("all");
+    setWasteTypeFilter("all");
+    setOnlyMine(false);
+    setSelectedDate(undefined);
+  };
+
+  const filteredEvents = events.filter((e) => {
+    if (selectedDate && !moment(e.date).isSame(selectedDate, "day")) return false;
+    if (categoryFilter !== "all" && !e.categories?.includes(categoryFilter)) return false;
+    if (wasteTypeFilter !== "all" && !e.waste_types?.includes(wasteTypeFilter)) return false;
+    if (onlyMine && e.created_by !== user?.id) return false;
+    return true;
+  });
 
   const categoryColors = {
     workshop: "bg-primary/10 text-primary",
@@ -90,104 +113,183 @@ export default function Events() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16">
         <div className="h-[0.5px] bg-border mb-8" />
-        {!loading && events.length > 0 && (
+
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           <EventsCalendar events={events} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
-        )}
+
+          <div className="flex-1 w-full">
+            {loading ? (
+              <div className="flex justify-center py-24">
+                <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
+              </div>
+            ) : (
+              <>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <span className="text-xs tracking-[0.15em] uppercase text-foreground/70">Filter</span>
+
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="border border-border bg-background px-3 py-1.5 text-xs tracking-[0.1em] uppercase text-foreground/70 focus:border-primary focus:outline-none transition-colors"
+                >
+                  <option value="all">All Categories</option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={wasteTypeFilter}
+                  onChange={(e) => setWasteTypeFilter(e.target.value)}
+                  className="border border-border bg-background px-3 py-1.5 text-xs tracking-[0.1em] uppercase text-foreground/70 focus:border-accent focus:outline-none transition-colors"
+                >
+                  <option value="all">All Waste Types</option>
+                  {WASTE_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="flex items-center gap-1 text-xs tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors"
+                  >
+                    <X size={12} />
+                    Clear
+                  </button>
+                )}
+
+                {isAuthenticated && (
+                  <button
+                    onClick={() => setOnlyMine((v) => !v)}
+                    className={cn(
+                      "px-3 py-1.5 text-xs tracking-[0.1em] uppercase border transition-colors ml-auto",
+                      onlyMine
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-border text-foreground/70 hover:border-primary hover:text-primary"
+                    )}
+                  >
+                    Your Events
+                  </button>
+                )}
+              </div>
+
+            {events.length === 0 ? (
+              <div className="text-center py-24 w-full">
+                <p className="text-foreground/70 text-lg mb-2">No upcoming events</p>
+                <p className="text-foreground/70 text-sm">
+                  Check back soon for sustainability events across Arizona.
+                </p>
+              </div>
+            ) : filteredEvents.length === 0 ? (
+              <div className="text-center py-24 w-full">
+                <p className="text-foreground/70 text-lg mb-2">No events match your filters</p>
+                <p className="text-foreground/70 text-sm">
+                  Try a different date, tag, waste type, or clearing "Your Events".
+                </p>
+              </div>
+            ) : (
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredEvents.map((event) => (
+                  <button
+                    key={event.id}
+                    onClick={() => setSelectedEvent(event)}
+                    className="border border-border hover:border-primary/30 transition-colors bg-card text-left flex flex-col"
+                  >
+                    {/* Date pillar top */}
+                    <div className="p-6 border-b border-border">
+                      <span className="font-heading text-3xl text-primary block">
+                        {moment(event.date).format("DD")}
+                      </span>
+                      <span className="text-xs tracking-[0.15em] uppercase text-foreground/70">
+                        {moment(event.date).format("MMM YYYY")}
+                      </span>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6 flex-1 flex flex-col">
+                      <h3 className="font-heading text-lg text-foreground mb-1 line-clamp-2">{event.title}</h3>
+
+                      {event.organization && (
+                        <div className="flex items-center gap-1.5 text-foreground/60 text-xs mb-3">
+                          <Building2 size={12} />
+                          <span>{event.organization}</span>
+                        </div>
+                      )}
+
+                      {event.categories?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {event.categories.map((c) => (
+                            <span
+                              key={c}
+                              className={`inline-block text-xs tracking-[0.1em] uppercase px-2 py-0.5 ${categoryColors[c] || "bg-border text-foreground"}`}
+                            >
+                              {c}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {event.waste_types?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {event.waste_types.map((type) => (
+                            <span
+                              key={type}
+                              className="inline-block text-[10px] tracking-[0.05em] uppercase px-1.5 py-0.5 border border-border text-foreground/60"
+                            >
+                              {type}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {event.location && (
+                        <p className="text-foreground/70 text-sm mt-auto">{event.location}</p>
+                      )}
+                    </div>
+
+                    {/* Join button */}
+                    <div className="p-6 pt-0">
+                      <span className="block text-center bg-foreground text-background py-2.5 text-xs tracking-[0.1em] uppercase hover:bg-primary transition-colors">
+                        View Details
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
-
-      {loading ? (
-        <div className="flex justify-center py-24">
-          <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
-        </div>
-      ) : events.length === 0 ? (
-        <div className="text-center py-24 max-w-7xl mx-auto px-6 md:px-12">
-          <p className="text-foreground/70 text-lg mb-2">No upcoming events</p>
-          <p className="text-foreground/70 text-sm">
-            Check back soon for sustainability events across Arizona.
-          </p>
-        </div>
-      ) : filteredEvents.length === 0 ? (
-        <div className="text-center py-24 max-w-7xl mx-auto px-6 md:px-12">
-          <p className="text-foreground/70 text-lg mb-2">No events on this date</p>
-          <p className="text-foreground/70 text-sm">
-            Try selecting a different date on the calendar.
-          </p>
-        </div>
-      ) : (
-        <div className="relative max-w-7xl mx-auto px-6 md:px-12 mb-16">
-          {/* Scroll controls */}
-          <div className="flex gap-2 mb-6 justify-end">
-            <button
-              onClick={() => scroll(-1)}
-              className="w-10 h-10 border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              onClick={() => scroll(1)}
-              className="w-10 h-10 border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-
-          {/* Horizontal Timeline */}
-          <div
-            ref={scrollRef}
-            className="flex gap-1 overflow-x-auto pb-4 scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {filteredEvents.map((event) => (
-              <button
-                key={event.id}
-                onClick={() => setSelectedEvent(event)}
-                className="flex-shrink-0 w-72 border border-border hover:border-primary/30 transition-colors bg-card text-left flex flex-col"
-              >
-                {/* Date pillar top */}
-                <div className="p-6 border-b border-border">
-                  <span className="font-heading text-3xl text-primary block">
-                    {moment(event.date).format("DD")}
-                  </span>
-                  <span className="text-xs tracking-[0.15em] uppercase text-foreground/70">
-                    {moment(event.date).format("MMM YYYY")}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 flex-1 flex flex-col">
-                  {event.category && (
-                    <span className={`inline-block self-start text-xs tracking-[0.1em] uppercase px-2 py-0.5 mb-3 ${categoryColors[event.category] || "bg-border text-foreground"}`}>
-                      {event.category}
-                    </span>
-                  )}
-                  <h3 className="font-heading text-lg text-foreground mb-2 line-clamp-2">{event.title}</h3>
-                  {event.location && (
-                    <p className="text-foreground/70 text-sm mt-auto">{event.location}</p>
-                  )}
-                </div>
-
-                {/* Join button */}
-                <div className="p-6 pt-0">
-                  <span className="block text-center bg-foreground text-background py-2.5 text-xs tracking-[0.1em] uppercase hover:bg-primary transition-colors">
-                    View Details
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <Footer />
 
       {selectedEvent && (
-        <EventDetailPanel event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+        <EventDetailPanel
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          onDeleted={handleEventDeleted}
+          onEdit={handleEditClick}
+        />
       )}
 
-      {showAddEvent && (
-        <AddEventModal onClose={() => setShowAddEvent(false)} onCreated={handleEventCreated} />
+      {(showAddEvent || editingEvent) && (
+        <AddEventModal
+          event={editingEvent}
+          onClose={() => {
+            setShowAddEvent(false);
+            setEditingEvent(null);
+          }}
+          onCreated={handleEventCreated}
+        />
       )}
     </div>
   );

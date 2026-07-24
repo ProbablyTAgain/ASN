@@ -5,8 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
-const WASTE_TYPES = ["Electronics", "Organic", "Construction", "Hazardous", "Recyclables", "Industrial"];
+import { WASTE_TYPES } from "@/lib/constants";
 
 export default function Profile() {
   const { toast } = useToast();
@@ -243,7 +242,7 @@ export default function Profile() {
             </div>
 
             <div>
-              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-3">Waste Types Handled</label>
+              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-3">Resource Types Handled</label>
               <div className="flex flex-wrap gap-2">
                 {WASTE_TYPES.map((type) => (
                   <button

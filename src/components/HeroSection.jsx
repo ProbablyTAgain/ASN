@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import HeroIllustration from "@/components/HeroIllustration";
+import { WASTE_TYPES } from "@/lib/constants";
 
 export default function HeroSection() {
   return (
@@ -46,12 +47,9 @@ export default function HeroSection() {
                   <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Waste Type</label>
                   <select className="w-full bg-white border border-border px-4 py-3 text-foreground text-sm focus:border-primary focus:outline-none transition-colors">
                     <option value="">Select waste type</option>
-                    <option>Electronics</option>
-                    <option>Organic</option>
-                    <option>Construction</option>
-                    <option>Hazardous</option>
-                    <option>Recyclables</option>
-                    <option>Industrial</option>
+                    {WASTE_TYPES.map((type) => (
+                      <option key={type}>{type}</option>
+                    ))}
                   </select>
                 </div>
                 <div>

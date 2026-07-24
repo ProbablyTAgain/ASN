@@ -6,8 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ResourceCard from "@/components/ResourceCard";
 import ResourceDetailPanel from "@/components/ResourceDetailPanel";
-
-const WASTE_TYPES = ["Electronics", "Organic", "Construction", "Hazardous", "Recyclables", "Industrial"];
+import { WASTE_TYPES } from "@/lib/constants";
 
 export default function Dashboard() {
   const [businesses, setBusinesses] = useState([]);

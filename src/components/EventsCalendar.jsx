@@ -6,7 +6,7 @@ export default function EventsCalendar({ events, selectedDate, onSelectDate }) {
   const eventDates = events.map((e) => moment(e.date).toDate());
 
   return (
-    <div className="border border-border bg-card p-4 mb-8 inline-block">
+    <div className="border border-border bg-card p-6 mb-8 inline-block">
       <Calendar
         mode="single"
         selected={selectedDate}

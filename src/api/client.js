@@ -1,64 +1,69 @@
 import { supabase } from "@/lib/supabase";
 
-const STORAGE_KEYS = {
-  events: "asn_site_events",
-};
+// Local fallback for events until the `events` table migration
+// (supabase/migrations/0004_events.sql) has been run against the project.
+// Once that table exists, Supabase calls stop erroring and this is skipped.
+const LOCAL_EVENTS_KEY = "asn_local_events";
 
-const readStorage = (key, defaultValue) => {
-  const value = localStorage.getItem(key);
-  if (!value) return defaultValue;
+const readLocalEvents = () => {
   try {
-    return JSON.parse(value);
+    return JSON.parse(localStorage.getItem(LOCAL_EVENTS_KEY)) || [];
   } catch {
-    return defaultValue;
+    return [];
   }
 };
 
-const writeStorage = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
+const writeLocalEvents = (events) => {
+  localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(events));
 };
 
-const generateId = () => {
+const generateLocalId = () => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 };
 
-const getEvents = () => readStorage(STORAGE_KEYS.events, []);
-const saveEvents = (events) => writeStorage(STORAGE_KEYS.events, events);
-
-const ensureSampleEvents = () => {
-  const existing = getEvents();
+const ensureLocalSampleEvents = () => {
+  const existing = readLocalEvents();
   if (existing.length > 0) return existing;
 
   const sampleEvents = [
     {
-      id: generateId(),
+      id: generateLocalId(),
       title: "Community Cleanup Day",
+      organization: "Keep Phoenix Beautiful",
       date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
       location: "Downtown Phoenix",
-      category: "cleanup",
+      categories: ["cleanup"],
+      waste_types: ["Recycling", "Chemicals"],
       description: "Join neighbors to clean up local parks and public spaces.",
+      created_by: null,
     },
     {
-      id: generateId(),
+      id: generateLocalId(),
       title: "Zero Waste Workshop",
+      organization: "Tempe Public Library",
       date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       location: "Tempe Library",
-      category: "workshop",
+      categories: ["workshop"],
+      waste_types: ["Food", "Recycling"],
       description: "Learn practical tips to reduce waste at home and work.",
+      created_by: null,
     },
     {
-      id: generateId(),
+      id: generateLocalId(),
       title: "Sustainability Networking Night",
+      organization: "Scottsdale Innovation Hub",
       date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       location: "Scottsdale Innovation Hub",
-      category: "networking",
+      categories: ["networking", "conference"],
+      waste_types: [],
       description: "Connect with other sustainability-minded local businesses.",
+      created_by: null,
     },
   ];
-  saveEvents(sampleEvents);
+  writeLocalEvents(sampleEvents);
   return sampleEvents;
 };
 
@@ -105,14 +110,49 @@ const api = {
     },
     Event: {
       list: async () => {
-        const events = ensureSampleEvents();
-        return [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const { data, error } = await supabase
+          .from("events")
+          .select("*")
+          .order("date", { ascending: true });
+        if (error) {
+          return [...ensureLocalSampleEvents()].sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+        return data;
       },
       create: async (data) => {
-        const events = ensureSampleEvents();
-        const newEvent = { id: generateId(), ...data, createdAt: Date.now() };
-        saveEvents([...events, newEvent]);
-        return newEvent;
+        const { data: created, error } = await supabase
+          .from("events")
+          .insert(data)
+          .select()
+          .single();
+        if (error) {
+          const newEvent = { id: generateLocalId(), ...data, created_at: new Date().toISOString() };
+          writeLocalEvents([...readLocalEvents(), newEvent]);
+          return newEvent;
+        }
+        return created;
+      },
+      update: async (id, data) => {
+        const { data: updated, error } = await supabase
+          .from("events")
+          .update(data)
+          .eq("id", id)
+          .select()
+          .single();
+        if (error) {
+          const events = readLocalEvents();
+          const updatedEvent = { ...events.find((e) => e.id === id), ...data, id };
+          writeLocalEvents(events.map((e) => (e.id === id ? updatedEvent : e)));
+          return updatedEvent;
+        }
+        return updated;
+      },
+      delete: async (id) => {
+        const { error } = await supabase.from("events").delete().eq("id", id);
+        if (error) {
+          writeLocalEvents(readLocalEvents().filter((e) => e.id !== id));
+          return;
+        }
       },
     },
   },

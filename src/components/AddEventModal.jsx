@@ -1,21 +1,37 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import moment from "moment";
 import { api } from "@/api/client";
+import { useAuth } from "@/lib/AuthContext";
+import { WASTE_TYPES } from "@/lib/constants";
 
-const CATEGORIES = ["cleanup", "workshop", "networking", "conference", "webinar"];
+export const CATEGORIES = ["cleanup", "workshop", "networking", "conference", "webinar"];
 
-export default function AddEventModal({ onClose, onCreated }) {
+export default function AddEventModal({ event, onClose, onCreated }) {
+  const { user } = useAuth();
+  const isEditing = !!event;
   const [form, setForm] = useState({
-    title: "",
-    date: "",
-    location: "",
-    category: "workshop",
-    description: "",
+    title: event?.title || "",
+    organization: event?.organization || "",
+    date: event?.date ? moment(event.date).format("YYYY-MM-DD") : "",
+    location: event?.location || "",
+    categories: event?.categories || [],
+    waste_types: event?.waste_types || [],
+    description: event?.description || "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+
+  const toggleInList = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter((v) => v !== value)
+        : [...prev[field], value],
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,14 +39,24 @@ export default function AddEventModal({ onClose, onCreated }) {
       setError("Title and date are required.");
       return;
     }
+    if (form.categories.length === 0) {
+      setError("Pick at least one tag.");
+      return;
+    }
     setSubmitting(true);
     setError("");
     try {
-      const created = await api.entities.Event.create({
-        ...form,
-        date: new Date(form.date).toISOString(),
-      });
-      onCreated(created);
+      const saved = isEditing
+        ? await api.entities.Event.update(event.id, {
+            ...form,
+            date: new Date(form.date).toISOString(),
+          })
+        : await api.entities.Event.create({
+            ...form,
+            date: new Date(form.date).toISOString(),
+            created_by: user.id,
+          });
+      onCreated(saved);
     } catch (err) {
       setError(err.message || "Something went wrong.");
     } finally {
@@ -50,8 +76,12 @@ export default function AddEventModal({ onClose, onCreated }) {
           <X size={20} />
         </button>
 
-        <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">Post an Event</p>
-        <h2 className="font-heading text-2xl text-foreground mb-8">Add to the Calendar</h2>
+        <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">
+          {isEditing ? "Edit Event" : "Post an Event"}
+        </p>
+        <h2 className="font-heading text-2xl text-foreground mb-8">
+          {isEditing ? "Update Event Details" : "Add to the Calendar"}
+        </h2>
 
         {error && (
           <div className="mb-6 p-3 bg-destructive/10 text-destructive text-sm">{error}</div>
@@ -70,30 +100,69 @@ export default function AddEventModal({ onClose, onCreated }) {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Date *</label>
-              <input
-                type="date"
-                value={form.date}
-                onChange={(e) => update("date", e.target.value)}
-                className="w-full bg-background border border-border px-4 py-3 text-foreground text-sm focus:border-primary focus:outline-none transition-colors"
-                required
-              />
+          <div>
+            <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Organization / Company</label>
+            <input
+              type="text"
+              value={form.organization}
+              onChange={(e) => update("organization", e.target.value)}
+              placeholder="Your Organization Name"
+              className="w-full bg-background border border-border px-4 py-3 text-foreground text-sm placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Date *</label>
+            <input
+              type="date"
+              value={form.date}
+              onChange={(e) => update("date", e.target.value)}
+              className="w-full bg-background border border-border px-4 py-3 text-foreground text-sm focus:border-primary focus:outline-none transition-colors"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">
+              Tags * <span className="normal-case text-foreground/50">(pick as many as apply)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => toggleInList("categories", c)}
+                  className={`px-3 py-1.5 text-xs tracking-[0.05em] uppercase transition-colors ${
+                    form.categories.includes(c)
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border text-foreground/70 hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
             </div>
-            <div>
-              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Category</label>
-              <select
-                value={form.category}
-                onChange={(e) => update("category", e.target.value)}
-                className="w-full bg-background border border-border px-4 py-3 text-foreground text-sm focus:border-primary focus:outline-none transition-colors"
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c.charAt(0).toUpperCase() + c.slice(1)}
-                  </option>
-                ))}
-              </select>
+          </div>
+
+          <div>
+            <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">
+              Waste Types <span className="normal-case text-foreground/50">(optional)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {WASTE_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => toggleInList("waste_types", type)}
+                  className={`px-3 py-1.5 text-xs tracking-[0.05em] uppercase transition-colors ${
+                    form.waste_types.includes(type)
+                      ? "bg-accent text-background"
+                      : "border border-border text-foreground/70 hover:border-accent hover:text-accent"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -103,7 +172,7 @@ export default function AddEventModal({ onClose, onCreated }) {
               type="text"
               value={form.location}
               onChange={(e) => update("location", e.target.value)}
-              placeholder="Tempe Library"
+              placeholder="Location of the event"
               className="w-full bg-background border border-border px-4 py-3 text-foreground text-sm placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
             />
           </div>
@@ -124,7 +193,7 @@ export default function AddEventModal({ onClose, onCreated }) {
             disabled={submitting}
             className="w-full bg-primary text-primary-foreground py-3.5 text-sm tracking-[0.1em] uppercase hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
-            {submitting ? "Posting..." : "Post Event"}
+            {submitting ? "Saving..." : isEditing ? "Save Changes" : "Post Event"}
           </button>
         </form>
       </div>
