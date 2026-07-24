@@ -99,7 +99,14 @@ export default function Profile() {
       toast({ title: "Profile saved successfully" });
     } catch (e) {
       console.error(e);
-      toast({ title: "Failed to save", description: e.message || "Please try again.", variant: "destructive" });
+      const message = e.message || "Please try again.";
+      toast({
+        title: message.toLowerCase().includes("profanity")
+          ? "Inappropriate Language in Profile"
+          : "Failed to save",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }

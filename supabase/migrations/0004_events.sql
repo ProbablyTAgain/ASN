@@ -16,29 +16,52 @@ create table if not exists public.events (
   updated_at timestamptz not null default now()
 );
 
+-- Adds these columns if the table existed before they were introduced
+alter table public.events add column if not exists organization text;
+alter table public.events add column if not exists categories text[] not null default '{}';
+alter table public.events add column if not exists waste_types text[] not null default '{}';
+
 alter table public.events enable row level security;
+
+-- Remove old or existing policies so this script can be run again safely
+drop policy if exists "Events are viewable by everyone" on public.events;
+drop policy if exists "Users can insert their own events" on public.events;
+drop policy if exists "Users can update their own events" on public.events;
+drop policy if exists "Users can delete their own events" on public.events;
 
 -- Anyone (signed in or not) can browse events on the public calendar.
 create policy "Events are viewable by everyone"
-  on public.events for select
+  on public.events
+  for select
   to anon, authenticated
   using (true);
 
 -- You can only post an event under your own account.
 create policy "Users can insert their own events"
-  on public.events for insert
+  on public.events
+  for insert
   to authenticated
-  with check (auth.uid() = created_by);
+  with check (
+    auth.uid() = created_by
+  );
 
 -- You can only edit your own events.
 create policy "Users can update their own events"
-  on public.events for update
+  on public.events
+  for update
   to authenticated
-  using (auth.uid() = created_by)
-  with check (auth.uid() = created_by);
+  using (
+    auth.uid() = created_by
+  )
+  with check (
+    auth.uid() = created_by
+  );
 
 -- You can only delete your own events.
 create policy "Users can delete their own events"
-  on public.events for delete
+  on public.events
+  for delete
   to authenticated
-  using (auth.uid() = created_by);
+  using (
+    auth.uid() = created_by
+  );

@@ -3,12 +3,14 @@ import { X } from "lucide-react";
 import moment from "moment";
 import { api } from "@/api/client";
 import { useAuth } from "@/lib/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 import { WASTE_TYPES } from "@/lib/constants";
 
 export const CATEGORIES = ["cleanup", "workshop", "networking", "conference", "webinar"];
 
 export default function AddEventModal({ event, onClose, onCreated }) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const isEditing = !!event;
   const [form, setForm] = useState({
     title: event?.title || "",
@@ -58,7 +60,15 @@ export default function AddEventModal({ event, onClose, onCreated }) {
           });
       onCreated(saved);
     } catch (err) {
-      setError(err.message || "Something went wrong.");
+      const message = err.message || "Something went wrong.";
+      setError(message);
+      toast({
+        title: message.toLowerCase().includes("profanity")
+          ? "Inappropriate Language in Event"
+          : "Couldn't save event",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -94,7 +104,8 @@ export default function AddEventModal({ event, onClose, onCreated }) {
               type="text"
               value={form.title}
               onChange={(e) => update("title", e.target.value)}
-              placeholder="Zero Waste Workshop"
+              placeholder="Your Event Name"
+              autoComplete="off"
               className="w-full bg-background border border-border px-4 py-3 text-foreground text-sm placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
               required
             />

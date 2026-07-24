@@ -17,6 +17,15 @@ const writeLocalEvents = (events) => {
   localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(events));
 };
 
+// Only fall back to localStorage when the `events` table genuinely doesn't
+// exist yet (migration not run). Any other error - RLS rejection, a trigger
+// blocking profanity, a network issue - must propagate to the caller instead
+// of being silently swallowed by writing to local storage anyway.
+const isMissingTableError = (error) =>
+  error?.code === "PGRST205" ||
+  error?.code === "42P01" ||
+  /schema cache|does not exist/i.test(error?.message || "");
+
 const generateLocalId = () => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();
@@ -115,6 +124,7 @@ const api = {
           .select("*")
           .order("date", { ascending: true });
         if (error) {
+          if (!isMissingTableError(error)) throw error;
           return [...ensureLocalSampleEvents()].sort((a, b) => new Date(a.date) - new Date(b.date));
         }
         return data;
@@ -126,6 +136,7 @@ const api = {
           .select()
           .single();
         if (error) {
+          if (!isMissingTableError(error)) throw error;
           const newEvent = { id: generateLocalId(), ...data, created_at: new Date().toISOString() };
           writeLocalEvents([...readLocalEvents(), newEvent]);
           return newEvent;
@@ -140,6 +151,7 @@ const api = {
           .select()
           .single();
         if (error) {
+          if (!isMissingTableError(error)) throw error;
           const events = readLocalEvents();
           const updatedEvent = { ...events.find((e) => e.id === id), ...data, id };
           writeLocalEvents(events.map((e) => (e.id === id ? updatedEvent : e)));
@@ -150,6 +162,7 @@ const api = {
       delete: async (id) => {
         const { error } = await supabase.from("events").delete().eq("id", id);
         if (error) {
+          if (!isMissingTableError(error)) throw error;
           writeLocalEvents(readLocalEvents().filter((e) => e.id !== id));
           return;
         }
