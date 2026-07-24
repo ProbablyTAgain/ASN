@@ -20,7 +20,7 @@ export default function Navbar() {
             <Link to="/" className="text-foreground text-xs tracking-[0.2em] uppercase hover:text-primary transition-colors">
               Home
             </Link>
-            <Link to="/dashboard" className="text-foreground text-xs tracking-[0.2em] uppercase hover:text-primary transition-colors">
+            <Link to="/resource" className="text-foreground text-xs tracking-[0.2em] uppercase hover:text-primary transition-colors">
               Resources
             </Link>
             <Link to="/events" className="text-foreground text-xs tracking-[0.2em] uppercase hover:text-primary transition-colors">
@@ -71,7 +71,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-8">
               {[
             { label: "Home", to: "/" },
-            { label: "Resources", to: "/dashboard" },
+            { label: "Resources", to: "/resource" },
             { label: "Events", to: "/events" },
             { label: "Profile", to: "/profile" }].
             map((item) =>

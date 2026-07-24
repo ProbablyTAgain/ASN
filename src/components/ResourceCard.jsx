@@ -1,12 +1,25 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import { Phone, Mail, Globe, MapPin } from "lucide-react";
 
 export default function ResourceCard({ business, onClick }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const requireAuth = (action) => {
+    if (!isAuthenticated) {
+      navigate("/register");
+      return;
+    }
+
+    action();
+  };
 
   return (
     <div
-      onClick={onClick}
+      onClick={() => requireAuth(onClick)}
       className="border border-border p-6 md:p-8 hover:border-primary/30 transition-colors bg-card cursor-pointer"
     >
       <div className="flex items-start gap-5 mb-6">
@@ -60,6 +73,10 @@ export default function ResourceCard({ business, onClick }) {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              if (!isAuthenticated) {
+                navigate("/register");
+                return;
+              }
               if (phoneRevealed) {
                 window.location.href = `tel:${business.phone}`;
               } else {
@@ -74,8 +91,14 @@ export default function ResourceCard({ business, onClick }) {
         )}
         {business.email && (
           <a
-            href={`mailto:${business.email}`}
-            onClick={(e) => e.stopPropagation()}
+            href={isAuthenticated ? `mailto:${business.email}` : undefined}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isAuthenticated) {
+                e.preventDefault();
+                navigate("/register");
+              }
+            }}
             className="flex-1 flex items-center justify-center gap-2 border border-foreground text-foreground py-3 text-sm tracking-[0.05em] uppercase hover:bg-foreground hover:text-background transition-colors"
           >
             <Mail size={14} />
@@ -86,10 +109,16 @@ export default function ResourceCard({ business, onClick }) {
 
       {business.website && (
         <a
-          href={business.website}
+          href={isAuthenticated ? business.website : undefined}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!isAuthenticated) {
+              e.preventDefault();
+              navigate("/register");
+            }
+          }}
           className="flex items-center justify-center gap-2 mt-3 text-primary text-sm hover:underline"
         >
           <Globe size={14} />

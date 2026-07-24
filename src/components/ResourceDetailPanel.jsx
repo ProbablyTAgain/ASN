@@ -1,8 +1,30 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import { X, Phone, Mail, Globe, MapPin } from "lucide-react";
 
 export default function ResourceDetailPanel({ business, onClose }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const requireAuth = (action) => {
+    if (!isAuthenticated) {
+      navigate("/register");
+      return;
+    }
+
+    action();
+  };
+
+  const handleOpen = () => {
+    if (!isAuthenticated) {
+      navigate("/register");
+      return;
+    }
+
+    onClose();
+  };
 
   if (!business) return null;
 
@@ -65,11 +87,13 @@ export default function ResourceDetailPanel({ business, onClose }) {
             {business.phone && (
               <button
                 onClick={() => {
-                  if (phoneRevealed) {
-                    window.location.href = `tel:${business.phone}`;
-                  } else {
-                    setPhoneRevealed(true);
-                  }
+                  requireAuth(() => {
+                    if (phoneRevealed) {
+                      window.location.href = `tel:${business.phone}`;
+                    } else {
+                      setPhoneRevealed(true);
+                    }
+                  });
                 }}
                 className="flex-1 flex items-center justify-center gap-2 bg-foreground text-background py-3.5 text-sm tracking-[0.05em] uppercase hover:bg-primary transition-colors"
               >
@@ -80,6 +104,12 @@ export default function ResourceDetailPanel({ business, onClose }) {
             {business.email && (
               <a
                 href={`mailto:${business.email}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  requireAuth(() => {
+                    window.location.href = `mailto:${business.email}`;
+                  });
+                }}
                 className="flex-1 flex items-center justify-center gap-2 border border-foreground text-foreground py-3.5 text-sm tracking-[0.05em] uppercase hover:bg-foreground hover:text-background transition-colors"
               >
                 <Mail size={14} />
@@ -93,6 +123,12 @@ export default function ResourceDetailPanel({ business, onClose }) {
               href={business.website}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                requireAuth(() => {
+                  window.open(business.website, "_blank", "noopener,noreferrer");
+                });
+              }}
               className="flex items-center justify-center gap-2 mt-3 text-primary text-sm hover:underline"
             >
               <Globe size={14} />

@@ -11,7 +11,7 @@ import Home from '@/pages/Home';
 import About from '@/pages/About';
 import FAQ from '@/pages/FAQ';
 import SustainabilityQuiz from '@/pages/SustainabilityQuiz';
-import Dashboard from '@/pages/Dashboard';
+import Resource from '@/pages/Resource';
 import Events from '@/pages/Events';
 import Profile from '@/pages/Profile';
 import Login from '@/pages/Login';
@@ -44,7 +44,7 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/events" element={<Events />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/resource" element={<Resource />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />

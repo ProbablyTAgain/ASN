@@ -24,11 +24,15 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      console.log("Attempting Supabase login", { email, passwordLength: password.length });
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      console.log("Supabase login response", { data, error: signInError });
       if (signInError) throw signInError;
       navigate("/");
     } catch (err) {
-      setError(getErrorMessage(err, "Invalid email or password"));
+      console.error("Supabase login failed", err);
+      const rawMessage = err?.message || JSON.stringify(err);
+      setError(getErrorMessage(err, `Invalid email or password. ${rawMessage}`));
     } finally {
       setLoading(false);
     }

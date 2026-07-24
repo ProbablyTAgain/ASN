@@ -4,6 +4,22 @@ import { supabase } from "@/lib/supabase";
 
 const AuthContext = createContext(null);
 
+function getAuthRedirectUrl() {
+  const configuredRedirect = import.meta.env.VITE_SUPABASE_REDIRECT_URL?.trim();
+  if (configuredRedirect) {
+    return configuredRedirect;
+  }
+
+  const { hostname, port } = window.location;
+  const normalizedPort = port ? `:${port}` : "";
+
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return `http://localhost${normalizedPort}/`;
+  }
+
+  return `${window.location.origin}${import.meta.env.BASE_URL || "/"}`;
+}
+
 export function AuthProvider({ children }) {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
@@ -40,9 +56,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
-    // window.location.origin never includes a path, so on GitHub Pages
-    // (served under /ASN/) it would redirect back outside the app entirely.
-    const redirectTo = window.location.origin + import.meta.env.BASE_URL;
+    const redirectTo = getAuthRedirectUrl();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },
