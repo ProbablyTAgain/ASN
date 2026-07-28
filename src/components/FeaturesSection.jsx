@@ -1,26 +1,26 @@
 import React from "react";
-import { Phone, Mail, Building2, CalendarDays } from "lucide-react";
+import { Compass, BadgeCheck, BookOpen, CalendarDays } from "lucide-react";
 
 const features = [
 {
-  icon: Phone,
-  title: "Direct Phone Access",
-  description: "Call verified waste management partners directly — no middleman, no delays. Every resource in our directory has a confirmed phone line."
+  icon: Compass,
+  title: "Personalized Sustainability Guidance",
+  description: "Custom recommendations tailored to each Arizonan based on their location, needs, goals, and operations."
 },
 {
-  icon: Mail,
-  title: "Email Connect",
-  description: "Initiate email conversations with resource providers instantly. Pre-formatted templates help you communicate your needs efficiently."
+  icon: BadgeCheck,
+  title: "Verified Programs, Utilities & Rebates",
+  description: "Access to accurate, location-specific resources including utility programs, incentives, rebates, and statewide sustainability initiatives."
 },
 {
-  icon: Building2,
-  title: "Business Profiles",
-  description: "Upload your logo and showcase your business. Build your brand's sustainability presence within Arizona's growing green economy."
+  icon: BookOpen,
+  title: "Learning & Environmental Education",
+  description: "Clear, approachable information on sustainability practices, waste reduction, energy and water efficiency, and greenhouse gas basics."
 },
 {
   icon: CalendarDays,
-  title: "Community Events",
-  description: "Stay connected with sustainability workshops, networking events, and industry conferences happening across Arizona."
+  title: "Community Events & Local Engagement",
+  description: "Connections to Arizona sustainability events, workshops, and community opportunities that support learning and action."
 }];
 
 
@@ -31,7 +31,7 @@ export default function FeaturesSection() {
         <div className="max-w-2xl mb-16 md:mb-24">
           <p className="tracking-[0.3em] uppercase mb-4 text-[hsl(var(--accent))] text-sm">HOW IT WORKS</p>
           <h2 className="font-heading text-3xl md:text-5xl text-foreground leading-tight mb-6">
-            Your bridge to sustainable waste management
+            Your link to custom waste resources
           </h2>
           <div className="h-[0.5px] w-24 bg-primary" />
         </div>

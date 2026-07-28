@@ -5,8 +5,8 @@ import {
   FaFacebook,
   FaInstagram,
   FaLinkedin,
-  FaTwitter,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -27,9 +27,13 @@ export default function Footer() {
               Navigator
             </h3>
 
+            <p className="text-background/70 text-sm italic mb-4">
+              A Collaboration for Good Initiative.
+            </p>
+
             <p className="text-background/60 text-sm max-w-sm leading-relaxed">
-              Connecting Arizona businesses to waste management resources for
-              a sustainable future.
+              Connecting Arizonans to sustainability resources that support a
+              cleaner future.
             </p>
           </div>
 
@@ -63,23 +67,25 @@ export default function Footer() {
 
             <div className="flex flex-col gap-3">
               <a
-                href="tel:+16025551234"
+                href="https://www.collaborationforgood.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-primary text-sm underline underline-offset-4 hover:no-underline"
               >
-                (602) 555-1234
+                www.collaborationforgood.com
               </a>
 
               <a
-                href="mailto:info@azsustainability.org"
+                href="mailto:connect@collaborationforgood.com"
                 className="text-primary text-sm underline underline-offset-4 hover:no-underline"
               >
-                info@azsustainability.org
+                connect@collaborationforgood.com
               </a>
             </div>
 
             <div className="flex items-center gap-4 mt-6">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/arizonasustainabilitynavigator/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -89,7 +95,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/arizonasustainabilitynavigator/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -99,7 +105,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/arizonasustainabilitynavigator/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
@@ -109,13 +115,13 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://twitter.com"
+                href="https://x.com/azsustainnav"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Twitter"
+                aria-label="X"
                 className="text-background/60 hover:text-primary transition-colors"
               >
-                <FaTwitter size={18} />
+                <FaXTwitter size={18} />
               </a>
             </div>
           </div>

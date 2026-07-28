@@ -11,10 +11,10 @@ export default function CTASection() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 text-center">
         <p className="tracking-[0.3em] uppercase mb-6 text-accent-light text-sm">JOIN THE NETWORK</p>
         <h2 className="font-heading text-3xl md:text-5xl lg:text-6xl text-background leading-tight mb-6 max-w-3xl mx-auto">
-          Your business is a pillar of Arizona's future
+          Your engagement drives a more sustainable Arizona
         </h2>
         <p className="text-background/60 text-lg max-w-xl mx-auto mb-10">
-          Sign up to list your business, connect with resources, and join a community committed to sustainable growth.
+          Sign up to access personalized sustainability tools and join a statewide community working toward meaningful environmental progress.
         </p>
         <Link
           to="/register"

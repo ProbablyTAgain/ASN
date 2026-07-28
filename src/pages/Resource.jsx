@@ -31,7 +31,10 @@ export default function Resource() {
   };
 
   const filtered = businesses.filter((b) => {
-    const matchesSearch = !search || b.business_name?.toLowerCase().includes(search.toLowerCase());
+    const normalizedSearch = search.trim().toLowerCase();
+    const matchesName = b.business_name?.toLowerCase().includes(normalizedSearch);
+    const matchesZip = b.zip_code && String(b.zip_code).toLowerCase().includes(normalizedSearch);
+    const matchesSearch = !normalizedSearch || matchesName || matchesZip;
     const matchesType = !filterType || b.waste_types?.includes(filterType);
     return matchesSearch && matchesType;
   });
@@ -61,7 +64,7 @@ export default function Resource() {
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/70" />
             <input
               type="text"
-              placeholder="Search businesses..."
+              placeholder="Search businesses or zip code..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-card border border-border pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"

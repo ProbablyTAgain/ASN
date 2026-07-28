@@ -15,10 +15,10 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <p className="text-xs tracking-[0.3em] uppercase text-primary mb-4">Our Mission</p>
           <h1 className="font-heading text-4xl md:text-6xl text-foreground leading-tight mb-6 max-w-3xl">
-            Building a greener Arizona, one connection at a time
+            Helping Arizona thrive through sustainable action
           </h1>
           <p className="text-foreground/70 text-lg max-w-2xl leading-relaxed">
-            The Arizona Sustainability Navigator exists to close the gap between local businesses and the waste management resources they need to operate responsibly.
+            The Arizona Sustainability Navigator exists to give every Arizonan clear, personalized guidance on sustainability — connecting them to local programs, utilities, rebates, and practical next steps.
           </p>
         </div>
       </div>
@@ -30,10 +30,10 @@ export default function About() {
           <div>
             <h2 className="font-heading text-2xl md:text-3xl text-foreground mb-6">Why we exist</h2>
             <p className="text-foreground/70 leading-relaxed mb-4">
-              Across Arizona, thousands of businesses generate waste every day — electronics, organic material, construction debris, hazardous byproducts — yet finding the right disposal or recycling partner is often confusing, time-consuming, and disconnected from real people.
+              Across Arizona, sustainability can feel out of reach — the right program, rebate, or resource is often scattered across agencies, utilities, and websites, leaving people unsure where to start.
             </p>
             <p className="text-foreground/70 leading-relaxed">
-              We built the Navigator to remove that friction. By putting verified waste management resources one phone call or email away, we help businesses act on sustainability instead of just intending to.
+              We built the Navigator to change that — delivering clear, personalized guidance so every Arizonan can turn good intentions into practical, everyday action.
             </p>
           </div>
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 aspect-[4/3]">
@@ -44,16 +44,16 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-1 mb-24 md:mb-32">
           {[
             {
-              title: "Connect",
-              text: "Direct phone and email access to verified waste management resources across the state — no middlemen, no delays."
+              title: "Guide",
+              text: "Personalized recommendations tailored to your location, needs, and goals — no guesswork required."
             },
             {
-              title: "Grow",
-              text: "Businesses build a public profile with their logo and story, gaining visibility as leaders in Arizona's green economy."
+              title: "Learn",
+              text: "Access to verified programs, utilities, rebates, and clear education on sustainability practices across the state."
             },
             {
               title: "Engage",
-              text: "A calendar of workshops, networking, and conferences keeps the community learning and connected year-round."
+              text: "A calendar of sustainability events, workshops, and community opportunities that keep Arizonans learning and connected year-round."
             }
           ].map((item) => (
             <div key={item.title} className="p-8 md:p-10 border border-border">
@@ -65,7 +65,7 @@ export default function About() {
 
         <div className="text-center pb-24 md:pb-32">
           <h2 className="font-heading text-2xl md:text-4xl text-foreground mb-6 max-w-xl mx-auto">
-            Join the businesses shaping Arizona's sustainable future
+            Your engagement drives a more sustainable Arizona
           </h2>
           <Link
             to="/register"

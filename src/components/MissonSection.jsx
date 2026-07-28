@@ -11,11 +11,11 @@ export default function MissionSection() {
           <div>
             <p className="tracking-[0.3em] uppercase mb-4 text-sm text-[hsl(var(--accent))]">OUR MISSION</p>
             <h2 className="font-heading text-3xl md:text-5xl text-foreground leading-tight mb-6">
-              Building a greener Arizona, one connection at a time
+              Helping Arizona thrive through sustainable action
             </h2>
             <div className="h-[0.5px] w-24 bg-primary mb-8" />
             <p className="text-foreground/70 leading-relaxed mb-8 max-w-lg">
-              We close the gap between local businesses and the waste management resources they need to operate responsibly — putting verified partners one phone call or email away.
+              We inspire sustainable choices by making environmental action clearer, more accessible, and rooted in Arizona's local strengths — empowering communities to move forward together.
             </p>
             <Link
               to="/about"
