@@ -1,13 +1,10 @@
-export const ORG_TYPE_OPTIONS = [
-  "Retail",
-  "Restaurant / Food Service",
-  "Manufacturing",
-  "Office / Professional Services",
-  "Healthcare",
-  "Construction",
-  "Hospitality",
-  "Nonprofit",
-  "Other",
+export const ORG_COUNTRY_OPTIONS = [
+  "United States",
+  "Canada",
+  "United Kingdom",
+  "Germany",
+  "France",
+  "Australia",
 ];
 
 export const EMPLOYEE_COUNT_OPTIONS = ["1-10", "11-50", "51-200", "201-500", "500+"];

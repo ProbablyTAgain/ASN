@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import QuizProgress from "@/components/quiz/QuizProgress";
 import QuizResults from "@/components/quiz/QuizResults";
+import CountryDropdown from "@/components/quiz/CountryDropdown";
 import {
-  ORG_TYPE_OPTIONS,
+  ORG_COUNTRY_OPTIONS,
   EMPLOYEE_COUNT_OPTIONS,
   SUSTAINABILITY_STEP_OPTIONS,
   TOOLS_USED_OPTIONS,
@@ -13,9 +14,11 @@ import {
   SUPPORT_OPTIONS } from
 "@/lib/quizRecommendations";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 10;
 
 const INITIAL_ANSWERS = {
+  orgZipCode: "",
+  orgCountry: "",
   orgType: "",
   orgTypeOther: "",
   employeeCount: "",
@@ -62,7 +65,7 @@ export default function SustainabilityQuiz() {
   };
 
   const canContinue = () => {
-    if (step === 0) return answers.orgType && (answers.orgType !== "Other" || answers.orgTypeOther.trim());
+    if (step === 0) return !!answers.orgCountry;
     if (step === 1) return !!answers.employeeCount;
     if (step === 2) {
       return (
@@ -116,37 +119,28 @@ export default function SustainabilityQuiz() {
 
           {step === 0 &&
           <div>
-              <p className="text-xs tracking-[0.3em] uppercase mb-4 text-[hsl(var(--accent))]">Question 1 of {TOTAL_STEPS}</p>
+              <p className="text-xs tracking-[0.3em] uppercase mb-4 text-[hsl(var(--accent))]">
+                Question 1 of {TOTAL_STEPS}
+              </p>
               <h1 className="font-heading text-2xl md:text-4xl text-foreground leading-tight mb-10">
-                What best describes your organization?
+                Where are you located?
               </h1>
 
-              <div className="mb-10">
-                <div className="flex flex-wrap gap-2">
-                  {ORG_TYPE_OPTIONS.map((option) =>
-                <button
-                  key={option}
-                  onClick={() => update("orgType", option)}
-                  className={`px-4 py-2.5 text-sm tracking-[0.02em] transition-colors ${
-                  answers.orgType === option ?
-                  "bg-primary text-primary-foreground" :
-                  "border border-border text-foreground/70 hover:border-primary hover:text-primary"}`
-                  }>
-                  
-                      {option}
-                    </button>
-                )}
-                </div>
-
-                {answers.orgType === "Other" &&
-              <input
+              <div className="mb-10 space-y-4">
+                <input
                 type="text"
-                value={answers.orgTypeOther}
-                onChange={(e) => update("orgTypeOther", e.target.value)}
-                placeholder="Tell us more"
-                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors mt-4" />
+                value={answers.orgZipCode}
+                onChange={(e) => update("orgZipCode", e.target.value)}
+                placeholder="Enter your zip code"
+                className="w-full bg-card border border-border px-4 py-3.5 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors" />
 
-              }
+
+                <CountryDropdown
+                options={ORG_COUNTRY_OPTIONS}
+                value={answers.orgCountry}
+                onChange={(option) => update("orgCountry", option)}
+                zipCode={answers.orgZipCode} />
+
               </div>
             </div>
           }
