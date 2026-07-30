@@ -38,8 +38,8 @@ export default function ResourceCardMinimal({ business, onClick }) {
           <h3 className="font-heading text-lg text-foreground font-semibold truncate">
             {business.business_name}
           </h3>
-          {business.description && (
-            <p className="text-foreground/70 text-sm mt-1 line-clamp-2">{business.description}</p>
+          {business.tagline && (
+            <p className="text-foreground/70 text-sm mt-1 line-clamp-2">{business.tagline}</p>
           )}
         </div>
       </div>
@@ -57,10 +57,14 @@ export default function ResourceCardMinimal({ business, onClick }) {
         </div>
       )}
 
-      {business.zip_code && (
+      {(business.zip_code || business.location_type === "online") && (
         <div className="flex items-center gap-2 text-foreground/70 text-sm">
           <MapPin size={14} />
-          <span>{business.zip_code}</span>
+          <span>
+            {business.location_type === "online"
+              ? "Online / Virtual Service"
+              : [business.address, business.city, business.zip_code].filter(Boolean).join(", ")}
+          </span>
         </div>
       )}
     </div>

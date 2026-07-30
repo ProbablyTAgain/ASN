@@ -20,10 +20,10 @@ export default function ResourceCard({ business, onClick }) {
   return (
     <div
       onClick={() => requireAuth(onClick)}
-      className="border border-border p-6 md:p-8 hover:border-primary/30 transition-colors bg-card cursor-pointer"
+      className="border border-border p-6 hover:border-primary/30 transition-colors bg-card cursor-pointer"
     >
-      <div className="flex items-start gap-5 mb-6">
-        <div className="w-16 h-16 rounded-full border-2 border-primary flex items-center justify-center overflow-hidden flex-shrink-0 bg-background">
+      <div className="flex items-start gap-4 mb-5">
+        <div className="w-14 h-14 rounded-full border-2 border-primary flex items-center justify-center overflow-hidden flex-shrink-0 bg-background">
           {business.logo_url ? (
             <img
               src={business.logo_url}
@@ -31,7 +31,7 @@ export default function ResourceCard({ business, onClick }) {
               className="w-full h-full object-cover rounded-full"
             />
           ) : (
-            <span className="font-heading text-primary text-xl font-bold">
+            <span className="font-heading text-primary text-lg font-bold">
               {business.business_name?.charAt(0) || "B"}
             </span>
           )}
@@ -40,8 +40,8 @@ export default function ResourceCard({ business, onClick }) {
           <h3 className="font-heading text-lg text-foreground font-semibold truncate">
             {business.business_name}
           </h3>
-          {business.description && (
-            <p className="text-foreground/70 text-sm mt-1 line-clamp-2">{business.description}</p>
+          {business.tagline && (
+            <p className="text-foreground/70 text-sm mt-0.5 line-clamp-2">{business.tagline}</p>
           )}
         </div>
       </div>
@@ -51,7 +51,7 @@ export default function ResourceCard({ business, onClick }) {
           {business.waste_types.map((type) => (
             <span
               key={type}
-              className="text-xs tracking-[0.1em] uppercase text-accent bg-accent/10 px-3 py-1"
+              className="text-xs tracking-[0.1em] uppercase text-accent bg-accent/10 px-2.5 py-1"
             >
               {type}
             </span>
@@ -59,16 +59,20 @@ export default function ResourceCard({ business, onClick }) {
         </div>
       )}
 
-      {business.zip_code && (
+      {(business.zip_code || business.location_type === "online") && (
         <div className="flex items-center gap-2 text-foreground/70 text-sm mb-5">
-          <MapPin size={14} />
-          <span>{business.zip_code}</span>
+          <MapPin size={14} className="flex-shrink-0" />
+          <span className="truncate">
+            {business.location_type === "online"
+              ? "Online / Virtual Service"
+              : [business.address, business.city, business.zip_code].filter(Boolean).join(", ")}
+          </span>
         </div>
       )}
 
       <div className="h-[0.5px] bg-border mb-5" />
 
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         {business.phone && (
           <button
             onClick={(e) => {
@@ -83,10 +87,10 @@ export default function ResourceCard({ business, onClick }) {
                 setPhoneRevealed(true);
               }
             }}
-            className="flex-1 flex items-center justify-center gap-2 bg-foreground text-background py-3 text-sm tracking-[0.05em] uppercase hover:bg-primary transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 bg-foreground text-background px-3 py-2.5 text-sm tracking-[0.03em] uppercase hover:bg-primary transition-colors whitespace-nowrap"
           >
-            <Phone size={14} />
-            {phoneRevealed ? business.phone : "Call Resource"}
+            <Phone size={13} className="flex-shrink-0" />
+            <span className="truncate">{phoneRevealed ? business.phone : "Call"}</span>
           </button>
         )}
         {business.email && (
@@ -99,10 +103,10 @@ export default function ResourceCard({ business, onClick }) {
                 navigate("/register");
               }
             }}
-            className="flex-1 flex items-center justify-center gap-2 border border-foreground text-foreground py-3 text-sm tracking-[0.05em] uppercase hover:bg-foreground hover:text-background transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 border border-foreground text-foreground px-3 py-2.5 text-sm tracking-[0.03em] uppercase hover:bg-foreground hover:text-background transition-colors whitespace-nowrap"
           >
-            <Mail size={14} />
-            Initiate Email
+            <Mail size={13} className="flex-shrink-0" />
+            Email
           </a>
         )}
       </div>
@@ -119,9 +123,9 @@ export default function ResourceCard({ business, onClick }) {
               navigate("/register");
             }
           }}
-          className="flex items-center justify-center gap-2 mt-3 text-primary text-sm hover:underline"
+          className="flex items-center justify-center gap-1.5 mt-3 text-primary text-sm hover:underline"
         >
-          <Globe size={14} />
+          <Globe size={13} />
           Visit Website
         </a>
       )}

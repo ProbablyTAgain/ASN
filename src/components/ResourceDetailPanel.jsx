@@ -54,11 +54,16 @@ export default function ResourceDetailPanel({ business, onClose }) {
                 </span>
               )}
             </div>
-            <h2 className="font-heading text-2xl md:text-3xl text-foreground mt-2">{business.business_name}</h2>
+            <div className="mt-2">
+              <h2 className="font-heading text-2xl md:text-3xl text-foreground">{business.business_name}</h2>
+              {business.tagline && (
+                <p className="text-primary text-sm mt-1">{business.tagline}</p>
+              )}
+            </div>
           </div>
 
           {business.description && (
-            <p className="text-foreground/70 text-sm leading-relaxed mb-6">{business.description}</p>
+            <p className="text-foreground/80 text-base leading-relaxed mb-8 whitespace-pre-wrap">{business.description}</p>
           )}
 
           {business.waste_types?.length > 0 && (
@@ -74,10 +79,14 @@ export default function ResourceDetailPanel({ business, onClose }) {
             </div>
           )}
 
-          {business.zip_code && (
+          {(business.zip_code || business.location_type === "online") && (
             <div className="flex items-center gap-3 text-foreground/70 mb-8">
               <MapPin size={16} className="text-primary" />
-              <span className="text-sm">{business.zip_code}</span>
+              <span className="text-sm">
+                {business.location_type === "online"
+                  ? "Online / Virtual Service"
+                  : [business.address, business.city, business.zip_code].filter(Boolean).join(", ")}
+              </span>
             </div>
           )}
 

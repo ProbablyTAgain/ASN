@@ -17,11 +17,15 @@ export default function Profile() {
   const [existingId, setExistingId] = useState(null);
   const [form, setForm] = useState({
     business_name: "",
+    tagline: "",
     description: "",
     phone: "",
     email: "",
     website: "",
     zip_code: "",
+    location_type: "physical",
+    address: "",
+    city: "",
     logo_url: "",
     waste_types: [],
     is_listed: false
@@ -39,11 +43,15 @@ export default function Profile() {
         setExistingId(p.id);
         setForm({
           business_name: p.business_name || "",
+          tagline: p.tagline || "",
           description: p.description || "",
           phone: p.phone || "",
           email: p.email || "",
           website: p.website || "",
           zip_code: p.zip_code || "",
+          location_type: p.location_type || "physical",
+          address: p.address || "",
+          city: p.city || "",
           logo_url: p.logo_url || "",
           waste_types: p.waste_types || [],
           is_listed: p.is_listed || false
@@ -175,6 +183,7 @@ export default function Profile() {
             <div className="text-center mb-12 py-6 border-t border-b border-border">
               <p className="text-xs tracking-[0.2em] uppercase text-foreground/70 mb-2">Preview</p>
               <h2 className="font-heading text-3xl md:text-4xl text-foreground">{form.business_name}</h2>
+              {form.tagline && <p className="text-foreground/70 text-sm mt-2">{form.tagline}</p>}
             </div>
           )}
 
@@ -192,7 +201,19 @@ export default function Profile() {
             </div>
 
             <div>
-              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Description</label>
+              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Tagline</label>
+              <input
+                type="text"
+                value={form.tagline}
+                onChange={(e) => setForm((prev) => ({ ...prev, tagline: e.target.value }))}
+                placeholder="A short line shown on your resource card"
+                maxLength={80}
+                className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Description (full bio)</label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
@@ -237,7 +258,9 @@ export default function Profile() {
                 />
               </div>
               <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Zip Code</label>
+                <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">
+                  {form.location_type === "online" ? "Zip Code (service area)" : "Zip Code"}
+                </label>
                 <input
                   type="text"
                   value={form.zip_code}
@@ -247,6 +270,54 @@ export default function Profile() {
                 />
               </div>
             </div>
+
+            <div>
+              <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-3">Location Type</label>
+              <div className="flex gap-2">
+                {[
+                  { value: "physical", label: "Physical Location" },
+                  { value: "online", label: "Online / Virtual" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, location_type: option.value }))}
+                    className={`flex-1 px-4 py-3 text-sm tracking-[0.05em] uppercase transition-colors ${
+                      form.location_type === option.value
+                        ? "bg-accent text-background"
+                        : "border border-border text-foreground/70 hover:border-accent hover:text-accent"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {form.location_type === "physical" && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">Street Address</label>
+                  <input
+                    type="text"
+                    value={form.address}
+                    onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
+                    placeholder="123 Main St"
+                    className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-2">City</label>
+                  <input
+                    type="text"
+                    value={form.city}
+                    onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
+                    placeholder="Phoenix"
+                    className="w-full bg-card border border-border px-4 py-3 text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="text-xs tracking-[0.15em] uppercase text-foreground/70 block mb-3">Resource Types Handled</label>
