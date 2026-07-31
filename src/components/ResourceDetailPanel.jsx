@@ -57,7 +57,7 @@ export default function ResourceDetailPanel({ business, onClose }) {
             <div className="mt-2">
               <h2 className="font-heading text-2xl md:text-3xl text-foreground">{business.business_name}</h2>
               {business.tagline && (
-                <p className="text-primary text-sm mt-1">{business.tagline}</p>
+                <p className="text-[hsl(92_45%_34%)] text-sm mt-1">{business.tagline}</p>
               )}
             </div>
           </div>

@@ -12,8 +12,11 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-3">
-            <img src={`${import.meta.env.BASE_URL}ASN_Logo_NB.png`} alt="Arizona Sustainability Navigator logo" className="w-6 h-6 object-cover rounded-full" />
-            <span className="font-heading text-foreground text-sm font-semibold tracking-wide hidden sm:block">ARIZONA SUSTAINABILITY NAVIGATOR</span>
+            <img
+              src={`${import.meta.env.BASE_URL}ASN_logo_full.png`}
+              alt="Arizona Sustainability Navigator"
+              className="h-12 w-auto"
+            />
           </Link>
 
           <div className="hidden md:flex items-center gap-8">

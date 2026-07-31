@@ -183,7 +183,7 @@ export default function Profile() {
             <div className="text-center mb-12 py-6 border-t border-b border-border">
               <p className="text-xs tracking-[0.2em] uppercase text-foreground/70 mb-2">Preview</p>
               <h2 className="font-heading text-3xl md:text-4xl text-foreground">{form.business_name}</h2>
-              {form.tagline && <p className="text-foreground/70 text-sm mt-2">{form.tagline}</p>}
+              {form.tagline && <p className="text-[hsl(92_45%_34%)] text-sm mt-2">{form.tagline}</p>}
             </div>
           )}
 

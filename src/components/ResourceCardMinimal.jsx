@@ -39,7 +39,7 @@ export default function ResourceCardMinimal({ business, onClick }) {
             {business.business_name}
           </h3>
           {business.tagline && (
-            <p className="text-foreground/70 text-sm mt-1 line-clamp-2">{business.tagline}</p>
+            <p className="text-[hsl(92_45%_34%)] text-sm mt-1 line-clamp-2">{business.tagline}</p>
           )}
         </div>
       </div>
