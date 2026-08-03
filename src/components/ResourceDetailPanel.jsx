@@ -138,7 +138,7 @@ export default function ResourceDetailPanel({ business, onClose }) {
                   window.open(business.website, "_blank", "noopener,noreferrer");
                 });
               }}
-              className="flex items-center justify-center gap-2 mt-3 text-primary text-sm hover:underline"
+              className="flex items-center justify-center gap-2 mt-3 bg-primary text-primary-foreground py-3.5 text-sm tracking-[0.05em] uppercase hover:bg-foreground transition-colors"
             >
               <Globe size={14} />
               Visit Website

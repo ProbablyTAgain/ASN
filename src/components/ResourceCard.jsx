@@ -20,7 +20,7 @@ export default function ResourceCard({ business, onClick }) {
   return (
     <div
       onClick={() => requireAuth(onClick)}
-      className="border border-border p-6 hover:border-primary/30 transition-colors bg-card cursor-pointer"
+      className="h-full flex flex-col border border-border p-6 hover:border-primary/30 transition-colors bg-card cursor-pointer"
     >
       <div className="flex items-start gap-4 mb-5">
         <div className="w-14 h-14 rounded-full border-2 border-primary flex items-center justify-center overflow-hidden flex-shrink-0 bg-background">
@@ -70,32 +70,53 @@ export default function ResourceCard({ business, onClick }) {
         </div>
       )}
 
-      <div className="h-[0.5px] bg-border mb-5" />
+      <div className="mt-auto">
+        <div className="h-[0.5px] bg-border mb-5" />
 
-      <div className="flex gap-2">
-        {business.phone && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!isAuthenticated) {
-                navigate("/register");
-                return;
-              }
-              if (phoneRevealed) {
-                window.location.href = `tel:${business.phone}`;
-              } else {
-                setPhoneRevealed(true);
-              }
-            }}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-foreground text-background px-3 py-2.5 text-sm tracking-[0.03em] uppercase hover:bg-primary transition-colors whitespace-nowrap"
-          >
-            <Phone size={13} className="flex-shrink-0" />
-            <span className="truncate">{phoneRevealed ? business.phone : "Call"}</span>
-          </button>
-        )}
-        {business.email && (
+        <div className="flex gap-2">
+          {business.phone && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!isAuthenticated) {
+                  navigate("/register");
+                  return;
+                }
+                if (phoneRevealed) {
+                  window.location.href = `tel:${business.phone}`;
+                } else {
+                  setPhoneRevealed(true);
+                }
+              }}
+              className="flex-1 flex items-center justify-center gap-1.5 bg-foreground text-background px-3 py-2.5 text-sm tracking-[0.03em] uppercase hover:bg-primary transition-colors whitespace-nowrap"
+            >
+              <Phone size={13} className="flex-shrink-0" />
+              <span className="truncate">{phoneRevealed ? business.phone : "Call"}</span>
+            </button>
+          )}
+          {business.email && (
+            <a
+              href={isAuthenticated ? `mailto:${business.email}` : undefined}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!isAuthenticated) {
+                  e.preventDefault();
+                  navigate("/register");
+                }
+              }}
+              className="flex-1 flex items-center justify-center gap-1.5 border border-foreground text-foreground px-3 py-2.5 text-sm tracking-[0.03em] uppercase hover:bg-foreground hover:text-background transition-colors whitespace-nowrap"
+            >
+              <Mail size={13} className="flex-shrink-0" />
+              Email
+            </a>
+          )}
+        </div>
+
+        {business.website && (
           <a
-            href={isAuthenticated ? `mailto:${business.email}` : undefined}
+            href={isAuthenticated ? business.website : undefined}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={(e) => {
               e.stopPropagation();
               if (!isAuthenticated) {
@@ -103,32 +124,13 @@ export default function ResourceCard({ business, onClick }) {
                 navigate("/register");
               }
             }}
-            className="flex-1 flex items-center justify-center gap-1.5 border border-foreground text-foreground px-3 py-2.5 text-sm tracking-[0.03em] uppercase hover:bg-foreground hover:text-background transition-colors whitespace-nowrap"
+            className="flex items-center justify-center gap-1.5 mt-2 bg-primary text-primary-foreground px-3 py-2.5 text-sm tracking-[0.03em] uppercase hover:bg-foreground transition-colors"
           >
-            <Mail size={13} className="flex-shrink-0" />
-            Email
+            <Globe size={13} />
+            Visit Website
           </a>
         )}
       </div>
-
-      {business.website && (
-        <a
-          href={isAuthenticated ? business.website : undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isAuthenticated) {
-              e.preventDefault();
-              navigate("/register");
-            }
-          }}
-          className="flex items-center justify-center gap-1.5 mt-3 text-primary text-sm hover:underline"
-        >
-          <Globe size={13} />
-          Visit Website
-        </a>
-      )}
     </div>
   );
 }

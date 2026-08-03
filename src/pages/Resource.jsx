@@ -1,44 +1,62 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/api/client";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import zipcodes from "zipcodes";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ResourceCard from "@/components/ResourceCard";
 import ResourceDetailPanel from "@/components/ResourceDetailPanel";
-import { WASTE_TYPES } from "@/lib/constants";
+import CuratedResourceCard from "@/components/CuratedResourceCard";
+import CuratedResourceDetailPanel from "@/components/CuratedResourceDetailPanel";
+import { WASTE_TYPES, CURATED_RESOURCE_FILTERS } from "@/lib/constants";
 
 const SEARCH_RADIUS_MILES = 25;
 const ZIP_PATTERN = /^\d{5}$/;
+const PAGE_SIZE = 27;
 
 export default function Resource() {
   const [businesses, setBusinesses] = useState([]);
+  const [curatedResources, setCuratedResources] = useState([]);
+  const [curatedTotal, setCuratedTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [curatedLoading, setCuratedLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [curatedFilter, setCuratedFilter] = useState("");
   const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [selectedCuratedResource, setSelectedCuratedResource] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageInput, setPageInput] = useState("1");
+  const curatedRequestId = useRef(0);
 
   useEffect(() => {
     loadBusinesses();
   }, []);
 
-  const loadBusinesses = async () => {
-    try {
-      const data = await api.entities.BusinessProfile.list("-created_date", 50);
-      setBusinesses(data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const normalizedSearch = search.trim().toLowerCase();
   const isZipSearch = ZIP_PATTERN.test(normalizedSearch);
   const nearbyZips = isZipSearch ? new Set(zipcodes.radius(normalizedSearch, SEARCH_RADIUS_MILES)) : null;
 
-  const filtered = businesses
+  // Resolve nearby zips to city names (via the zipcodes package's full US
+  // database, not just our reference sheet) so curated resources — stored
+  // by city, not zip — can still be matched to a zip search, even for a
+  // zip that was never explicitly listed anywhere in our own data. Track
+  // each city's closest distance to the searched zip so results can be
+  // sorted nearest-first instead of alphabetically.
+  const cityDistances = isZipSearch
+    ? [...nearbyZips].reduce((map, z) => {
+        const info = zipcodes.lookup(z);
+        const dist = zipcodes.distance(normalizedSearch, z) ?? Infinity;
+        if (info?.city && (!map.has(info.city) || dist < map.get(info.city))) {
+          map.set(info.city, dist);
+        }
+        return map;
+      }, new Map())
+    : null;
+  const nearbyCities = isZipSearch ? new Set(cityDistances.keys()) : null;
+
+  const filteredBusinesses = businesses
     .filter((b) => {
       const businessZip = b.zip_code ? String(b.zip_code).trim() : "";
       const matchesName = b.business_name?.toLowerCase().includes(normalizedSearch);
@@ -55,6 +73,107 @@ export default function Resource() {
       const distB = zipcodes.distance(normalizedSearch, b.zip_code ? String(b.zip_code).trim() : "") ?? Infinity;
       return distA - distB;
     });
+
+  // Businesses fill the front of the combined, 27-per-page sequence;
+  // curated resources fill whatever's left on each page after that.
+  const businessCount = filteredBusinesses.length;
+  const pageStart = (page - 1) * PAGE_SIZE;
+  const businessesOnPage = filteredBusinesses.slice(pageStart, pageStart + PAGE_SIZE);
+  const curatedNeeded = PAGE_SIZE - businessesOnPage.length;
+  const curatedOffset = Math.max(0, pageStart - businessCount);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, curatedFilter, filterType]);
+
+  useEffect(() => {
+    if (loading) return; // wait for businessCount to be known before paginating
+    const timeout = setTimeout(() => {
+      loadCuratedResources();
+    }, 300);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, curatedFilter, page, loading, businessCount, isZipSearch]);
+
+  useEffect(() => {
+    setPageInput(String(page));
+  }, [page]);
+
+  const loadBusinesses = async () => {
+    try {
+      const data = await api.entities.BusinessProfile.list("-created_date", 50);
+      setBusinesses(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCuratedResources = async () => {
+    const requestId = ++curatedRequestId.current;
+    setCuratedLoading(true);
+    try {
+      const selectedFilter = CURATED_RESOURCE_FILTERS.find((f) => f.label === curatedFilter);
+
+      if (isZipSearch) {
+        // The database can't sort by "distance to a searched zip" (curated
+        // resources only have a city, not coordinates), so pull every
+        // matching row for the nearby cities, sort by real distance
+        // client-side, then slice out just this page. Capped well above any
+        // realistic match count for a single category within a 25mi radius.
+        const { data } = await api.entities.CuratedResource.list({
+          cities: [...nearbyCities],
+          categoryKeywords: selectedFilter?.keywords,
+          limit: 1000,
+          offset: 0,
+        });
+        if (requestId !== curatedRequestId.current) return;
+
+        const sorted = [...data].sort((a, b) => {
+          const distA = cityDistances.get(a.city) ?? Infinity;
+          const distB = cityDistances.get(b.city) ?? Infinity;
+          return distA - distB;
+        });
+
+        setCuratedTotal(sorted.length);
+        setCuratedResources(curatedNeeded > 0 ? sorted.slice(curatedOffset, curatedOffset + curatedNeeded) : []);
+        return;
+      }
+
+      const { data, count } = await api.entities.CuratedResource.list({
+        search: search.trim(),
+        categoryKeywords: selectedFilter?.keywords,
+        limit: Math.max(curatedNeeded, 0),
+        offset: curatedOffset,
+      });
+      // Ignore this response if a newer request has since been kicked off
+      // (e.g. businessCount just changed) — prevents a stale result from
+      // overwriting a more current one that resolves first.
+      if (requestId !== curatedRequestId.current) return;
+      setCuratedResources(curatedNeeded > 0 ? data : []);
+      setCuratedTotal(count);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (requestId === curatedRequestId.current) setCuratedLoading(false);
+    }
+  };
+
+  const totalCombined = businessCount + curatedTotal;
+  const totalPages = Math.max(1, Math.ceil(totalCombined / PAGE_SIZE));
+
+  const goToPage = (n) => {
+    const clamped = Math.min(Math.max(1, n), totalPages);
+    setPage(clamped);
+  };
+
+  const handlePageInputSubmit = (e) => {
+    e.preventDefault();
+    const n = parseInt(pageInput, 10);
+    if (!isNaN(n)) goToPage(n);
+    else setPageInput(String(page));
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,13 +219,32 @@ export default function Resource() {
               ))}
             </select>
           </div>
+          <div className="relative">
+            <SlidersHorizontal size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/70" />
+            <select
+              value={curatedFilter}
+              onChange={(e) => setCuratedFilter(e.target.value)}
+              className="bg-card border border-border pl-11 pr-8 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors appearance-none min-w-[220px]"
+            >
+              <option value="">All Resource Categories</option>
+              {CURATED_RESOURCE_FILTERS.map((f) => (
+                <option key={f.label} value={f.label}>{f.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {loading ? (
+        {curatedResources.length > 0 && (
+          <p className="text-foreground/50 text-xs mb-6">
+            * Official resource — provided directly, not a business submission.
+          </p>
+        )}
+
+        {loading || curatedLoading ? (
           <div className="flex justify-center py-24">
             <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
           </div>
-        ) : filtered.length === 0 ? (
+        ) : businessesOnPage.length === 0 && curatedResources.length === 0 ? (
           <div className="text-center py-24">
             <p className="text-foreground/70 text-lg mb-4">No resources found</p>
             <p className="text-foreground/70 text-sm mb-8">
@@ -123,9 +261,47 @@ export default function Resource() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-            {filtered.map((b) => (
+            {businessesOnPage.map((b) => (
               <ResourceCard key={b.id} business={b} onClick={() => setSelectedBusiness(b)} />
             ))}
+            {curatedResources.map((r) => (
+              <CuratedResourceCard key={r.id} resource={r} onClick={() => setSelectedCuratedResource(r)} />
+            ))}
+          </div>
+        )}
+
+        {!loading && !curatedLoading && totalCombined > PAGE_SIZE && (
+          <div className="flex items-center justify-center gap-4 mb-16">
+            <button
+              onClick={() => goToPage(page - 1)}
+              disabled={page <= 1}
+              aria-label="Previous page"
+              className="flex items-center justify-center w-10 h-10 border border-border text-foreground hover:border-primary disabled:opacity-30 disabled:hover:border-border transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <form onSubmit={handlePageInputSubmit} className="flex items-center gap-2 text-sm text-foreground/70">
+              <span>Page</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={pageInput}
+                onChange={(e) => setPageInput(e.target.value)}
+                onBlur={handlePageInputSubmit}
+                className="w-14 bg-card border border-border px-2 py-1.5 text-center text-foreground focus:border-primary focus:outline-none transition-colors"
+              />
+              <span>of {totalPages}</span>
+            </form>
+
+            <button
+              onClick={() => goToPage(page + 1)}
+              disabled={page >= totalPages}
+              aria-label="Next page"
+              className="flex items-center justify-center w-10 h-10 border border-border text-foreground hover:border-primary disabled:opacity-30 disabled:hover:border-border transition-colors"
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>
@@ -134,6 +310,13 @@ export default function Resource() {
 
       {selectedBusiness && (
         <ResourceDetailPanel business={selectedBusiness} onClose={() => setSelectedBusiness(null)} />
+      )}
+
+      {selectedCuratedResource && (
+        <CuratedResourceDetailPanel
+          resource={selectedCuratedResource}
+          onClose={() => setSelectedCuratedResource(null)}
+        />
       )}
     </div>
   );

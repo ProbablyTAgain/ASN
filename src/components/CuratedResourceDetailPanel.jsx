@@ -1,0 +1,102 @@
+import React, { useState } from "react";
+import { X, Phone, Mail, ExternalLink, MapPin } from "lucide-react";
+
+export default function CuratedResourceDetailPanel({ resource, onClose }) {
+  const [phoneRevealed, setPhoneRevealed] = useState(false);
+
+  if (!resource) return null;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex justify-end">
+      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-background h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right">
+        <div className="sticky top-0 bg-background z-10 p-6 border-b border-border flex items-center justify-between">
+          <span className="text-xs tracking-[0.2em] uppercase text-primary">Resource Details</span>
+          <button onClick={onClose} className="text-foreground/70 hover:text-foreground transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-8">
+          <div className="flex items-start gap-5 mb-6">
+            <div className="w-20 h-20 rounded-full border-2 border-primary flex items-center justify-center overflow-hidden flex-shrink-0 bg-background">
+              <img
+                src={`${import.meta.env.BASE_URL}resource_placeholder.png`}
+                alt=""
+                className="block w-12 h-12 object-contain"
+              />
+            </div>
+            <div className="mt-2">
+              <h2 className="font-heading text-2xl md:text-3xl text-foreground">
+                <span
+                  className="text-foreground/50 mr-1"
+                  title="Official resource — provided directly, not a business submission"
+                >
+                  *
+                </span>
+                {resource.resource_name}
+              </h2>
+              {resource.category && (
+                <p className="text-[hsl(92_45%_34%)] text-sm mt-1">{resource.category}</p>
+              )}
+            </div>
+          </div>
+
+          {(resource.city || resource.county) && (
+            <div className="flex items-center gap-3 text-foreground/70 mb-8">
+              <MapPin size={16} className="text-primary" />
+              <span className="text-sm">
+                {[resource.city, resource.county].filter(Boolean).join(", ")}
+              </span>
+            </div>
+          )}
+
+          <div className="h-[0.5px] bg-border mb-6" />
+
+          {(resource.phone || resource.email) && (
+            <div className="flex gap-3 mb-3">
+              {resource.phone && (
+                <button
+                  onClick={() => {
+                    if (phoneRevealed) {
+                      window.location.href = `tel:${resource.phone}`;
+                    } else {
+                      setPhoneRevealed(true);
+                    }
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 bg-foreground text-background py-3.5 text-sm tracking-[0.05em] uppercase hover:bg-primary transition-colors"
+                >
+                  <Phone size={14} />
+                  {phoneRevealed ? resource.phone : "Call Resource"}
+                </button>
+              )}
+              {resource.email && (
+                <a
+                  href={`mailto:${resource.email}`}
+                  className="flex-1 flex items-center justify-center gap-2 border border-foreground text-foreground py-3.5 text-sm tracking-[0.05em] uppercase hover:bg-foreground hover:text-background transition-colors"
+                >
+                  <Mail size={14} />
+                  Initiate Email
+                </a>
+              )}
+            </div>
+          )}
+
+          {resource.link ? (
+            <a
+              href={resource.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 text-sm tracking-[0.05em] uppercase hover:bg-foreground transition-colors"
+            >
+              <ExternalLink size={14} />
+              Visit Resource
+            </a>
+          ) : (
+            <p className="text-foreground/50 text-sm text-center py-3.5">No link available</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
