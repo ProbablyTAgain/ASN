@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import zipcodes from "zipcodes";
 import HeroIllustration from "@/components/HeroIllustration";
 import ResourceCardMinimal from "@/components/ResourceCardMinimal";
 import ResourceDetailPanel from "@/components/ResourceDetailPanel";
 import { api } from "@/api/client";
 import { WASTE_TYPES } from "@/lib/constants";
+
+const SEARCH_RADIUS_MILES = 25;
+const ZIP_PATTERN = /^\d{5}$/;
 
 export default function HeroSection() {
   const [wasteType, setWasteType] = useState("");
@@ -40,19 +44,37 @@ export default function HeroSection() {
       return;
     }
 
+    if (!ZIP_PATTERN.test(zipCode.trim())) {
+      setError("Please enter a valid 5-digit zip code.");
+      setHasSearched(false);
+      return;
+    }
+
     setError("");
     setHasSearched(true);
   };
 
-  const filteredBusinesses = hasSearched
-    ? businesses.filter((business) => {
-        const matchesType = wasteType === "all" || business.waste_types?.includes(wasteType);
-        const normalizedZip = zipCode.trim();
-        const businessZip = business.zip_code ? String(business.zip_code).trim() : "";
-        const matchesZip = !normalizedZip || businessZip.includes(normalizedZip);
+  const normalizedZip = zipCode.trim();
+  const nearbyZips = normalizedZip ? new Set(zipcodes.radius(normalizedZip, SEARCH_RADIUS_MILES)) : null;
 
-        return matchesType && matchesZip;
-      })
+  const filteredBusinesses = hasSearched
+    ? businesses
+        .filter((business) => {
+          const matchesType = wasteType === "all" || business.waste_types?.includes(wasteType);
+          const businessZip = business.zip_code ? String(business.zip_code).trim() : "";
+          const matchesZip = !normalizedZip || nearbyZips.has(businessZip);
+
+          return matchesType && matchesZip;
+        })
+        .sort((a, b) => {
+          if (!normalizedZip) return 0;
+          const zipA = a.zip_code ? String(a.zip_code).trim() : "";
+          const zipB = b.zip_code ? String(b.zip_code).trim() : "";
+          const distA = zipcodes.distance(normalizedZip, zipA) ?? Infinity;
+          const distB = zipcodes.distance(normalizedZip, zipB) ?? Infinity;
+
+          return distA - distB;
+        })
     : [];
 
   return (

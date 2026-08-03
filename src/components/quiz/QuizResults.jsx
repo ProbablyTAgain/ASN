@@ -3,8 +3,36 @@ import { Link } from "react-router-dom";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import { STEP_RECOMMENDATIONS } from "@/lib/quizRecommendations";
 
+// Maps the quiz's actual answer fields to the recommendation buckets in
+// STEP_RECOMMENDATIONS (recycling, composting, energy, sourcing, waste_audit, other).
+function getRecommendationKeys(answers) {
+  const topics = answers.orgSustainabilityTopics || [];
+  const supportNeeded = answers.orgSupportNeeded || [];
+  const completedAssessments = answers.orgCompletedAssessments || [];
+
+  const keys = [];
+
+  if (topics.includes("Energy efficiency")) keys.push("energy");
+
+  if (topics.includes("Waste reduction & recycling")) {
+    keys.push("recycling");
+    keys.push("composting");
+  }
+
+  if (topics.includes("Sustainable purchasing")) keys.push("sourcing");
+
+  // Recommend a waste audit if they asked for one and haven't already done one.
+  if (supportNeeded.includes("Waste audit") && !completedAssessments.includes("Waste audit")) {
+    keys.push("waste_audit");
+  }
+
+  if (keys.length === 0) keys.push("other");
+
+  return keys;
+}
+
 export default function QuizResults({ answers, onRestart }) {
-  const steps = answers.sustainabilitySteps?.length ? answers.sustainabilitySteps : ["other"];
+  const steps = getRecommendationKeys(answers);
   const recommendations = [];
   const seenTitles = new Set();
   for (const step of steps) {
@@ -15,7 +43,11 @@ export default function QuizResults({ answers, onRestart }) {
       }
     }
   }
-  const topRecommendations = recommendations.slice(0, 5);
+  const topRecommendations = recommendations.length ? recommendations.slice(0, 5) : STEP_RECOMMENDATIONS.other;
+
+  const orgTypeLabel = answers.orgType === "Something else" && answers.orgTypeOther
+    ? answers.orgTypeOther
+    : answers.orgType;
 
   return (
     <div>
@@ -24,7 +56,7 @@ export default function QuizResults({ answers, onRestart }) {
         Recommended resources for you
       </h1>
       <p className="text-foreground/70 text-lg mb-10">
-        Based on your profile as a {answers.orgType} ({answers.employeeCount}), here are resources to get you started.
+        Based on your profile as a {orgTypeLabel} ({answers.employeeCount}), here are resources to get you started.
       </p>
 
       <div className="space-y-1 mb-12">

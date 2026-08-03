@@ -117,6 +117,41 @@ const api = {
         return created;
       },
     },
+    CuratedResource: {
+      // Database-owned resources imported from the team's research spreadsheet.
+      // Server-side filtered/paginated since this table can hold thousands of rows.
+      list: async ({ category, categoryKeywords, county, city, cities, search, limit = 60, offset = 0 } = {}) => {
+        let request = supabase
+          .from("curated_resources")
+          .select("*", { count: "exact" })
+          .order("resource_name", { ascending: true })
+          .range(offset, offset + limit - 1);
+
+        if (category) request = request.eq("category", category);
+        if (categoryKeywords?.length) {
+          const clause = categoryKeywords
+            .map((kw) => `category.ilike.%${kw.replace(/[%,]/g, "")}%`)
+            .join(",");
+          request = request.or(clause);
+        }
+        if (county) request = request.eq("county", county);
+        if (city) request = request.ilike("city", city);
+        if (cities?.length) {
+          const clause = cities.map((c) => `city.ilike.${c.replace(/[%,]/g, "")}`).join(",");
+          request = request.or(clause);
+        }
+        if (search) {
+          const term = search.replace(/[%,]/g, "");
+          request = request.or(
+            `resource_name.ilike.%${term}%,city.ilike.%${term}%,county.ilike.%${term}%,category.ilike.%${term}%`
+          );
+        }
+
+        const { data, error, count } = await request;
+        if (error) throw error;
+        return { data, count: count ?? data.length };
+      },
+    },
     Event: {
       list: async () => {
         const { data, error } = await supabase

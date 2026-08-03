@@ -25,7 +25,12 @@
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.7",
     "react-icons": "^5.7.0",
+<<<<<<< HEAD
     "react-router-dom": "^7.11.0"
+=======
+    "react-router-dom": "^7.18.1",
+    "zipcodes": "^8.0.0"
+>>>>>>> 9e2e53b7a861f7c7d6a06331a752d5cf3b4bbb27
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -54,11 +54,16 @@ export default function ResourceDetailPanel({ business, onClose }) {
                 </span>
               )}
             </div>
-            <h2 className="font-heading text-2xl md:text-3xl text-foreground mt-2">{business.business_name}</h2>
+            <div className="mt-2">
+              <h2 className="font-heading text-2xl md:text-3xl text-foreground">{business.business_name}</h2>
+              {business.tagline && (
+                <p className="text-[hsl(92_45%_34%)] text-sm mt-1">{business.tagline}</p>
+              )}
+            </div>
           </div>
 
           {business.description && (
-            <p className="text-foreground/70 text-sm leading-relaxed mb-6">{business.description}</p>
+            <p className="text-foreground/80 text-base leading-relaxed mb-8 whitespace-pre-wrap">{business.description}</p>
           )}
 
           {business.waste_types?.length > 0 && (
@@ -74,10 +79,14 @@ export default function ResourceDetailPanel({ business, onClose }) {
             </div>
           )}
 
-          {business.zip_code && (
+          {(business.zip_code || business.location_type === "online") && (
             <div className="flex items-center gap-3 text-foreground/70 mb-8">
               <MapPin size={16} className="text-primary" />
-              <span className="text-sm">{business.zip_code}</span>
+              <span className="text-sm">
+                {business.location_type === "online"
+                  ? "Online / Virtual Service"
+                  : [business.address, business.city, business.zip_code].filter(Boolean).join(", ")}
+              </span>
             </div>
           )}
 
@@ -129,7 +138,7 @@ export default function ResourceDetailPanel({ business, onClose }) {
                   window.open(business.website, "_blank", "noopener,noreferrer");
                 });
               }}
-              className="flex items-center justify-center gap-2 mt-3 text-primary text-sm hover:underline"
+              className="flex items-center justify-center gap-2 mt-3 bg-primary text-primary-foreground py-3.5 text-sm tracking-[0.05em] uppercase hover:bg-foreground transition-colors"
             >
               <Globe size={14} />
               Visit Website

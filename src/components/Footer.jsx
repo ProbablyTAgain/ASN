@@ -21,11 +21,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-32">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
           <div className="md:col-span-2">
-            <h3 className="font-heading text-3xl md:text-4xl mb-4">
-              Arizona Sustainability
-              <br />
-              Navigator
-            </h3>
+            <img
+              src={`${import.meta.env.BASE_URL}ASN_logo_full.png`}
+              alt="Arizona Sustainability Navigator"
+              className="h-20 w-auto mb-4"
+            />
 
             <p className="text-background/70 text-sm italic mb-4">
               A Collaboration for Good Initiative.
