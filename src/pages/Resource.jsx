@@ -9,7 +9,7 @@ import ResourceCard from "@/components/ResourceCard";
 import ResourceDetailPanel from "@/components/ResourceDetailPanel";
 import CuratedResourceCard from "@/components/CuratedResourceCard";
 import CuratedResourceDetailPanel from "@/components/CuratedResourceDetailPanel";
-import { WASTE_TYPES, CURATED_RESOURCE_FILTERS } from "@/lib/constants";
+import { CURATED_RESOURCE_FILTERS } from "@/lib/constants";
 
 const SEARCH_RADIUS_MILES = 25;
 const ZIP_PATTERN = /^\d{5}$/;
@@ -22,7 +22,6 @@ export default function Resource() {
   const [loading, setLoading] = useState(true);
   const [curatedLoading, setCuratedLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("");
   const [curatedFilter, setCuratedFilter] = useState("");
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [selectedCuratedResource, setSelectedCuratedResource] = useState(null);
@@ -64,8 +63,16 @@ export default function Resource() {
         ? nearbyZips.has(businessZip)
         : businessZip.toLowerCase().includes(normalizedSearch);
       const matchesSearch = !normalizedSearch || matchesName || matchesZip;
-      const matchesType = !filterType || b.waste_types?.includes(filterType);
-      return matchesSearch && matchesType;
+      // The "Resource Category" filter is curated-resource-native, but it
+      // also shows businesses whose own waste_types overlap with what that
+      // category actually relates to (e.g. "Recycling & Waste" -> businesses
+      // tagged Recycling or Waste). Categories with no real waste-type
+      // equivalent (Policy & Advocacy, etc.) correctly show no businesses.
+      const selectedCuratedFilter = CURATED_RESOURCE_FILTERS.find((f) => f.label === curatedFilter);
+      const matchesCuratedFilter =
+        !curatedFilter ||
+        selectedCuratedFilter?.relatedWasteTypes.some((wt) => b.waste_types?.includes(wt));
+      return matchesSearch && matchesCuratedFilter;
     })
     .sort((a, b) => {
       if (!isZipSearch) return 0;
@@ -84,7 +91,7 @@ export default function Resource() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, curatedFilter, filterType]);
+  }, [search, curatedFilter]);
 
   useEffect(() => {
     if (loading) return; // wait for businessCount to be known before paginating
@@ -130,11 +137,12 @@ export default function Resource() {
         });
         if (requestId !== curatedRequestId.current) return;
 
-        const sorted = [...data].sort((a, b) => {
-          const distA = cityDistances.get(a.city) ?? Infinity;
-          const distB = cityDistances.get(b.city) ?? Infinity;
-          return distA - distB;
-        });
+        const closestDistance = (resource) =>
+          (resource.cities || []).reduce(
+            (min, c) => Math.min(min, cityDistances.get(c) ?? Infinity),
+            Infinity
+          );
+        const sorted = [...data].sort((a, b) => closestDistance(a) - closestDistance(b));
 
         setCuratedTotal(sorted.length);
         setCuratedResources(curatedNeeded > 0 ? sorted.slice(curatedOffset, curatedOffset + curatedNeeded) : []);
@@ -205,19 +213,6 @@ export default function Resource() {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-card border border-border pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-foreground/70 focus:border-primary focus:outline-none transition-colors"
             />
-          </div>
-          <div className="relative">
-            <SlidersHorizontal size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/70" />
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="bg-card border border-border pl-11 pr-8 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors appearance-none min-w-[200px]"
-            >
-              <option value="">All Waste Types</option>
-              {WASTE_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
           </div>
           <div className="relative">
             <SlidersHorizontal size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/70" />

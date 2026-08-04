@@ -120,9 +120,13 @@ const api = {
     CuratedResource: {
       // Database-owned resources imported from the team's research spreadsheet.
       // Server-side filtered/paginated since this table can hold thousands of rows.
-      list: async ({ category, categoryKeywords, county, city, cities, search, limit = 60, offset = 0 } = {}) => {
+      // Queries the curated_resources_grouped view, which collapses rows
+      // that share the same resource name + link (the same statewide/
+      // regional resource listed once per city in the source spreadsheet)
+      // into a single row with a combined cities/counties array.
+      list: async ({ category, categoryKeywords, wasteTypeKeywords, county, cities, search, limit = 60, offset = 0 } = {}) => {
         let request = supabase
-          .from("curated_resources")
+          .from("curated_resources_grouped")
           .select("*", { count: "exact" })
           .order("resource_name", { ascending: true })
           .range(offset, offset + limit - 1);
@@ -134,16 +138,18 @@ const api = {
             .join(",");
           request = request.or(clause);
         }
-        if (county) request = request.eq("county", county);
-        if (city) request = request.ilike("city", city);
-        if (cities?.length) {
-          const clause = cities.map((c) => `city.ilike.${c.replace(/[%,]/g, "")}`).join(",");
+        if (wasteTypeKeywords?.length) {
+          const clause = wasteTypeKeywords
+            .map((kw) => `category.ilike.%${kw.replace(/[%,]/g, "")}%`)
+            .join(",");
           request = request.or(clause);
         }
+        if (county) request = request.contains("counties", [county]);
+        if (cities?.length) request = request.overlaps("cities", cities);
         if (search) {
           const term = search.replace(/[%,]/g, "");
           request = request.or(
-            `resource_name.ilike.%${term}%,city.ilike.%${term}%,county.ilike.%${term}%,category.ilike.%${term}%`
+            `resource_name.ilike.%${term}%,city_text.ilike.%${term}%,county_text.ilike.%${term}%`
           );
         }
 

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { MapPin, ExternalLink, Phone, Mail } from "lucide-react";
+import { formatResourceLocations } from "@/lib/formatResourceLocations";
 
 export default function CuratedResourceCard({ resource, onClick }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const locationText = formatResourceLocations(resource);
 
   return (
     <div
@@ -18,14 +20,14 @@ export default function CuratedResourceCard({ resource, onClick }) {
           />
         </div>
         <div className="min-w-0">
-          <h3 className="font-heading text-lg text-foreground font-semibold">
+          <h3 className="font-heading text-lg text-foreground font-semibold line-clamp-2">
             <span
               className="text-foreground/50 mr-1"
               title="Official resource — provided directly, not a business submission"
             >
               *
             </span>
-            <span className="line-clamp-2">{resource.resource_name}</span>
+            {resource.resource_name}
           </h3>
           {resource.category && (
             <p className="text-[hsl(92_45%_34%)] text-sm mt-0.5 line-clamp-2">{resource.category}</p>
@@ -33,12 +35,23 @@ export default function CuratedResourceCard({ resource, onClick }) {
         </div>
       </div>
 
-      {(resource.city || resource.county) && (
-        <div className="flex items-center gap-2 text-foreground/70 text-sm mb-5">
-          <MapPin size={14} className="flex-shrink-0" />
-          <span className="truncate">
-            {[resource.city, resource.county].filter(Boolean).join(", ")}
-          </span>
+      {resource.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-5">
+          {resource.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-xs tracking-[0.1em] uppercase text-accent bg-accent/10 px-2.5 py-1"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {locationText && (
+        <div className="flex items-start gap-2 text-foreground/70 text-sm mb-5">
+          <MapPin size={14} className="flex-shrink-0 mt-0.5" />
+          <span className="line-clamp-3" title={locationText}>{locationText}</span>
         </div>
       )}
 

@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { X, Phone, Mail, ExternalLink, MapPin } from "lucide-react";
+import { formatResourceLocations } from "@/lib/formatResourceLocations";
 
 export default function CuratedResourceDetailPanel({ resource, onClose }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
 
   if (!resource) return null;
+
+  const locationText = formatResourceLocations(resource);
+  const locationCount = resource.cities?.length || resource.counties?.length || 0;
 
   return (
     <div className="fixed inset-0 z-[60] flex justify-end">
@@ -42,12 +46,30 @@ export default function CuratedResourceDetailPanel({ resource, onClose }) {
             </div>
           </div>
 
-          {(resource.city || resource.county) && (
-            <div className="flex items-center gap-3 text-foreground/70 mb-8">
-              <MapPin size={16} className="text-primary" />
-              <span className="text-sm">
-                {[resource.city, resource.county].filter(Boolean).join(", ")}
-              </span>
+          {resource.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {resource.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-xs tracking-[0.1em] uppercase text-accent bg-accent/10 px-3 py-1"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {locationText && (
+            <div className="flex items-start gap-3 text-foreground/70 mb-8">
+              <MapPin size={16} className="text-primary mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                {locationCount > 1 && (
+                  <p className="text-foreground/50 text-xs uppercase tracking-[0.1em] mb-1">
+                    Serves {locationCount} locations
+                  </p>
+                )}
+                <p>{locationText}</p>
+              </div>
             </div>
           )}
 
