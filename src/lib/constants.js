@@ -1,4 +1,4 @@
-export const WASTE_TYPES = ["Electricity", "Water", "Waste", "Recycling", "Transportation", "Food", "Paper", "Chemicals", "Rebates", "Grants"];
+export const WASTE_TYPES = ["Electricity", "Water", "Waste", "Recycling", "Transportation", "Food", "Paper", "Chemicals", "Rebates", "Grants", "Climate", "Conservation", "Community"];
 
 // Filters for the curated resource directory, matched against the
 // `category` column (which holds ~80 raw spreadsheet tab names) via keyword
@@ -21,18 +21,18 @@ export const CURATED_RESOURCE_FILTERS = [
   { label: "Water", keywords: ["water", "rainwater"], relatedWasteTypes: ["Water"] },
   { label: "Recycling & Waste", keywords: ["recycl", "waste", "compost"], relatedWasteTypes: ["Recycling", "Waste"] },
   { label: "EV & Transportation", keywords: ["ev charg", "transport", "fleet"], relatedWasteTypes: ["Transportation"] },
-  { label: "Climate & Emergency", keywords: ["climate", "emergency", "resilience", "carbon"], relatedWasteTypes: [] },
+  { label: "Climate & Emergency", keywords: ["climate", "emergency", "resilience", "carbon"], relatedWasteTypes: ["Climate"] },
   { label: "Air Quality & Pollution", keywords: ["air quality", "pollut", "emission"], relatedWasteTypes: ["Chemicals"] },
   { label: "Food & Agriculture", keywords: ["food", "agricultur"], relatedWasteTypes: ["Food"] },
   { label: "Green Building & Construction", keywords: ["green building", "building", "construction", "envelope", "maintenance"], relatedWasteTypes: [] },
-  { label: "Land & Wildlife Conservation", keywords: ["land conservation", "habitat", "wildlife", "biodiversity", "forestry"], relatedWasteTypes: [] },
+  { label: "Land & Wildlife Conservation", keywords: ["land conservation", "habitat", "wildlife", "biodiversity", "forestry"], relatedWasteTypes: ["Conservation"] },
   { label: "Environmental Health & Justice", keywords: ["environmental health", "environmental justice"], relatedWasteTypes: ["Chemicals"] },
   { label: "Circular Economy & Materials", keywords: ["circular economy", "materials"], relatedWasteTypes: ["Recycling"] },
   { label: "Policy & Advocacy", keywords: ["policy", "advocacy", "government"], relatedWasteTypes: [] },
   { label: "Workforce & Green Jobs", keywords: ["workforce", "green job", "employee", "training", "wellness"], relatedWasteTypes: [] },
   { label: "Business & Sustainability Programs", keywords: ["business", "corporat", "purchasing", "packaging", "supply", "certification", "marketing", "customer", "technical assistance", "operational", "reduction categor", "organization type", "facility type", "industry", "office", "paperless", "cost"], relatedWasteTypes: [] },
-  { label: "Events & Community", keywords: ["event", "community", "club", "hyper local"], relatedWasteTypes: [] },
-  { label: "Youth & Education", keywords: ["youth", "school", "knowledge"], relatedWasteTypes: [] },
+  { label: "Events & Community", keywords: ["event", "community", "club", "hyper local"], relatedWasteTypes: ["Community"] },
+  { label: "Youth & Education", keywords: ["youth", "school", "knowledge"], relatedWasteTypes: ["Community"] },
 ];
 
 // Maps each business waste-type tag to keywords matched against a curated
@@ -50,4 +50,7 @@ export const WASTE_TYPE_KEYWORDS = {
   Chemicals: ["chemical", "hazardous", "pollut", "air quality", "emission"],
   Rebates: ["rebate", "incentive"],
   Grants: ["grant", "financ", "tax credit"],
+  Climate: ["climate", "emergency", "resilience", "heat relief", "disaster"],
+  Conservation: ["conservation", "wildlife", "habitat", "biodiversity", "forestry"],
+  Community: ["community", "event", "workshop", "youth", "club"],
 };

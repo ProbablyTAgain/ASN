@@ -24,9 +24,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      console.log("Attempting Supabase login", { email, passwordLength: password.length });
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      console.log("Supabase login response", { data, error: signInError });
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw signInError;
       navigate("/");
     } catch (err) {
