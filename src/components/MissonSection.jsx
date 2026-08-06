@@ -1,9 +1,28 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import SustainabilityIllustration from "@/components/SustainabilityIllustration";
 
 export default function MissionSection() {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section className="py-24 md:py-40 relative">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
@@ -25,8 +44,17 @@ export default function MissionSection() {
             </Link>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 aspect-[4/3]">
-            <SustainabilityIllustration />
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 aspect-[16/9] border-8 border-background">
+            <video
+              ref={videoRef}
+              src="/mission-video.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
       </div>
