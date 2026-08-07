@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { api } from "@/api/client";
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import zipcodes from "zipcodes";
@@ -16,13 +16,22 @@ const ZIP_PATTERN = /^\d{5}$/;
 const PAGE_SIZE = 27;
 
 export default function Resource() {
+  // Pre-fills the search box and category filter from the sustainability
+  // quiz results page, when arriving via its "Connect with Resources" link
+  // (e.g. /resource?zip=85001&category=Energy+%26+Solar). Read once on
+  // mount only, not kept in sync with the URL afterward - the search box
+  // and dropdown remain the source of truth after that.
+  const [searchParams] = useSearchParams();
   const [businesses, setBusinesses] = useState([]);
   const [curatedResources, setCuratedResources] = useState([]);
   const [curatedTotal, setCuratedTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [curatedLoading, setCuratedLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [curatedFilter, setCuratedFilter] = useState("");
+  const [search, setSearch] = useState(() => searchParams.get("zip") || "");
+  const [curatedFilter, setCuratedFilter] = useState(() => {
+    const category = searchParams.get("category");
+    return CURATED_RESOURCE_FILTERS.some((f) => f.label === category) ? category : "";
+  });
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [selectedCuratedResource, setSelectedCuratedResource] = useState(null);
   const [page, setPage] = useState(1);

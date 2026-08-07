@@ -203,3 +203,19 @@ on conflict (keyword) do update set tag = excluded.tag;
 
 -- Re-backfill so the new categories/keywords apply to existing rows too.
 update public.curated_resources set resource_name = resource_name;
+
+-- Added Knowledge as a 14th tag, per the boss's request while rebuilding
+-- the source spreadsheet. Also added to WASTE_TYPES in
+-- src/lib/constants.js, shared with business profile tagging.
+insert into public.curated_resource_category_tags (category, tags) values
+  ('Knowledge', array['Knowledge'])
+on conflict (category) do update set tags = excluded.tags;
+
+insert into public.curated_resource_tag_keywords (keyword, tag) values
+  ('knowledge', 'Knowledge'),
+  ('education', 'Knowledge'),
+  ('how to', 'Knowledge'),
+  ('guide', 'Knowledge')
+on conflict (keyword) do update set tag = excluded.tag;
+
+update public.curated_resources set resource_name = resource_name;

@@ -1,4 +1,4 @@
-export const WASTE_TYPES = ["Electricity", "Water", "Waste", "Recycling", "Transportation", "Food", "Paper", "Chemicals", "Rebates", "Grants", "Climate", "Conservation", "Community"];
+export const WASTE_TYPES = ["Electricity", "Water", "Waste", "Recycling", "Transportation", "Food", "Paper", "Chemicals", "Rebates", "Grants", "Climate", "Conservation", "Community", "Knowledge"];
 
 // Filters for the curated resource directory, matched against the
 // `category` column (which holds ~80 raw spreadsheet tab names) via keyword
@@ -16,7 +16,7 @@ export const WASTE_TYPES = ["Electricity", "Water", "Waste", "Recycling", "Trans
 export const CURATED_RESOURCE_FILTERS = [
   { label: "Rebates & Incentives", keywords: ["rebate", "incentive"], relatedWasteTypes: ["Rebates"] },
   { label: "Financing & Grants", keywords: ["financ", "grant", "tax credit", "bank"], relatedWasteTypes: ["Grants"] },
-  { label: "Energy & Solar", keywords: ["energy", "solar", "renewable", "efficien", "led"], relatedWasteTypes: ["Electricity"] },
+  { label: "Energy & Solar", keywords: ["energy", "solar", "renewable", "led"], relatedWasteTypes: ["Electricity"] },
   { label: "Heating & Cooling", keywords: ["heat", "cooling", "hvac", "weatheriz"], relatedWasteTypes: ["Electricity"] },
   { label: "Water", keywords: ["water", "rainwater"], relatedWasteTypes: ["Water"] },
   { label: "Recycling & Waste", keywords: ["recycl", "waste", "compost"], relatedWasteTypes: ["Recycling", "Waste"] },
@@ -32,7 +32,7 @@ export const CURATED_RESOURCE_FILTERS = [
   { label: "Workforce & Green Jobs", keywords: ["workforce", "green job", "employee", "training", "wellness"], relatedWasteTypes: [] },
   { label: "Business & Sustainability Programs", keywords: ["business", "corporat", "purchasing", "packaging", "supply", "certification", "marketing", "customer", "technical assistance", "operational", "reduction categor", "organization type", "facility type", "industry", "office", "paperless", "cost"], relatedWasteTypes: [] },
   { label: "Events & Community", keywords: ["event", "community", "club", "hyper local"], relatedWasteTypes: ["Community"] },
-  { label: "Youth & Education", keywords: ["youth", "school", "knowledge"], relatedWasteTypes: ["Community"] },
+  { label: "Youth & Education", keywords: ["youth", "school", "knowledge"], relatedWasteTypes: ["Community", "Knowledge"] },
 ];
 
 // Maps each business waste-type tag to keywords matched against a curated
@@ -53,4 +53,5 @@ export const WASTE_TYPE_KEYWORDS = {
   Climate: ["climate", "emergency", "resilience", "heat relief", "disaster"],
   Conservation: ["conservation", "wildlife", "habitat", "biodiversity", "forestry"],
   Community: ["community", "event", "workshop", "youth", "club"],
+  Knowledge: ["knowledge", "education", "learn", "guide", "how to"],
 };
